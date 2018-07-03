@@ -1,0 +1,62 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./dist/main.js"></script>
+    <link rel="stylesheet" href="./src/main.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="root">
+        <div class="useraction-menu-wrapper">
+            <div class="useraction-menu">
+                <div class="useraction-menu-bd">
+                    <div class="useraction-logo">
+                        <a href="javascript:;" data-action="logo">ATS</a>
+                    </div>
+                    <div class="useraction-tools useraction-pin">
+                        <a href="javascript:;" data-action="pin" class="pin">
+                            <em>&nbsp;</em>
+                        </a>
+                    </div>
+                    <div class="useraction-tools useraction-date">
+                        <div id="useraction-date-start" class="input" data-action="newCalendar" data-type="start">2018-07-02</div>
+                        <div id="useraction-date-stop" class="input" data-action="newCalendar" data-type="stop">2018-07-02</div>
+                    </div>
+                    <div class="useraction-tools useraction-click">
+                        <a href="javascript:;" data-action="newClick" id="useraction-click-btn" class="useraction-btn useraction-click-btn default">
+                            <i>查看</i>
+                        </a>
+                    </div>
+                    <div class="useraction-tools useraction-heatmap">
+                        <a href="javascript:;" data-action="newMap" id="useraction-heatmap-btn" data-type="show" class="useraction-btn useraction-heatmap-btn default">
+                            <i>热力图</i>
+                        </a>
+                    </div>
+                    <div class="useraction-menu-user" id="useraction-menu-user">
+                        <p class="username">wumm
+                            <a class="logout" data-action="login" data-type="out" href="javascript:;">[退出]</a>
+                        </p>
+                    </div>
+                    <div class="useraction-tools useraction-login" style="display: none;">
+                        <a href="javascript:;" data-action="login" data-type="in" class="useraction-btn useraction-login-btn danger">登录</a>
+                    </div>
+                    <div class="useraction-tools useraction-pageid" id="useraction-pageid-wrap">
+                        <span id="useraction-pagename"></span>
+                        <input type="text" data-action="pageid" id="useraction-pageid-input" value="10320672927">
+                        <a href="javascript:;" data-action="confirmPageid" id="useraction-pageid-btn" class="useraction-btn useraction-pageid-btn success">确定</a>
+                    </div>
+                    <div class="useraction-menu-action">
+                        <a href="mailto:RDkjts@Ctrip.com?subject=[点击插件]" class="useraction-menu-action-support">联系我们</a>
+                        <a href="//cdataportal.ctripcorp.com/useraction/help" target="_blank" class="useraction-menu-action-help">数据说明</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
