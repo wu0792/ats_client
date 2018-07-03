@@ -1,10 +1,22 @@
-function component() {
-    var element = document.createElement('div');
+import NetWorkListener from './network'
+import $ from 'jquery'
 
-    // Lodash, currently included via a script, is required for this line to work
-    // element.innerHTML = _.join(['Hello', 'webpack'], ' ');
+var mutationObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        console.log(mutation);
+    });
+})
 
-    return element;
-}
+$(function () {
+    const netWorkListener = new NetWorkListener()
+    netWorkListener.init()
 
-document.body.appendChild(component());
+    mutationObserver.observe(document.documentElement, {
+        attributes: true,
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributeOldValue: true,
+        characterDataOldValue: true
+    })
+})

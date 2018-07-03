@@ -1,6 +1,6 @@
 export default class NetWorkListener {
     constructor() {
-
+ 
     }
 
     init() {
