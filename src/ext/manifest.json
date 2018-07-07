@@ -1,0 +1,32 @@
+{
+  "name": "ATS",
+  "description": "自动化测试录制工具",
+  "version": "0.6",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "declarativeContent",
+    "storage"
+  ],
+  "icons": {
+    "16": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon.png",
+      "24": "images/icon.png",
+      "32": "images/icon.png"
+    },
+    "default_title": "ATS",
+    "default_popup": "./html/popup.html"
+  },
+  "background": {
+    "scripts": [
+      "./html/background.js"
+    ],
+    "persistent": false
+  },
+  "manifest_version": 2
+}
