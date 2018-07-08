@@ -31,11 +31,11 @@ chrome.runtime.onMessage.addListener(
                 if (!existed) {
                     existed = {
                         url,
-                        mutations: []
+                        mutation: []
                     }
                 }
 
-                existed.mutations.push({
+                existed.mutation.push({
                     time: new Date(),
                     type: 'add',
                     selector: '#btn123'
@@ -50,3 +50,30 @@ chrome.runtime.onMessage.addListener(
             getActiveTab(cb)
         }
     });
+
+// track network activity
+var tabs = new Map()
+chrome.runtime.onConnect.addListener(function (port) {
+    if (port.name == "ats_devtools") {
+        port.onMessage.addListener(function (msg) {
+            const { url, method, body, date, tabId } = msg
+            let existed = tabs.get(tabId)
+
+            if (!existed) {
+                existed = {
+                    network: [],
+                    mutation: []
+                }
+            }
+
+            existed.network.push({ url, method, body, date })
+            tabs.set(tabId, existed)
+
+            chrome.storage.local.get([`ats_${tabId}`], function (result) {
+                console.log('Value currently is ' + result.key);
+            });
+
+            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+        })
+    }
+});

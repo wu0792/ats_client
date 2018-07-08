@@ -1,10 +1,17 @@
+//notify background
+var connection = chrome.runtime.connect({
+    name: "ats_devtools"
+})
+
 chrome.devtools.network.onRequestFinished.addListener(
     function (request) {
         request.getContent(function (content) {
             let url = request.request.url,
                 method = request.request.method,
-                body = content
+                body = content,
+                date = request.startedDateTime,
+                tabId = chrome.devtools.inspectedWindow.tabId
 
-            console.log({ url, method, body })
+            connection.postMessage({ type: 'network.request', url, method, body, date, tabId })
         })
     })
