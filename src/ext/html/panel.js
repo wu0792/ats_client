@@ -6,12 +6,11 @@ var connection = chrome.runtime.connect({
 chrome.devtools.network.onRequestFinished.addListener(
     function (request) {
         request.getContent(function (content) {
-            let url = request.request.url,
-                method = request.request.method,
+            const { request: innerRequest, startedDateTime: date } = request,
+                { url, postData, method } = innerRequest,
                 body = content,
-                date = request.startedDateTime,
                 tabId = chrome.devtools.inspectedWindow.tabId
 
-            connection.postMessage({ type: 'network.request', url, method, body, date, tabId })
+            connection.postMessage({ type: 'network.request', url, method, body, postData, date, tabId })
         })
     })

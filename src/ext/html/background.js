@@ -56,7 +56,7 @@ var tabs = new Map()
 chrome.runtime.onConnect.addListener(function (port) {
     if (port.name == "ats_devtools") {
         port.onMessage.addListener(function (msg) {
-            const { url, method, body, date, tabId } = msg
+            const { url, method, body, postData, date, tabId } = msg
             let existed = tabs.get(tabId)
 
             if (!existed) {
@@ -66,7 +66,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 }
             }
 
-            existed.network.push({ url, method, body, date })
+            existed.network.push({ url, method, body, postData, date })
             tabs.set(tabId, existed)
 
             chrome.storage.local.get([`ats_${tabId}`], function (result) {
@@ -74,6 +74,9 @@ chrome.runtime.onConnect.addListener(function (port) {
             });
 
             chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+
+            console.log('receive network message, now the set is:')
+            console.log(existed)
         })
     }
 });
