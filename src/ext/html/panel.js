@@ -9,7 +9,7 @@ chrome.devtools.network.onRequestFinished.addListener(
             const { request: innerRequest, startedDateTime: date } = request,
                 { url, postData, method } = innerRequest,
                 body = content,
-                tabId = chrome.devtools.inspectedWindow.tabId
+                tabId = 123// chrome.devtools.inspectedWindow.tabId
 
             connection.postMessage({ type: 'network.request', url, method, body, postData, date, tabId })
         })

@@ -51,27 +51,27 @@ chrome.runtime.onMessage.addListener(
         }
     });
 
-// track network activity
 var tabs = new Map()
+
+function ensureExist(tabId) {
+    let existed = tabs.get(tabId)
+
+    return existed || {
+        network: [],
+        mutation: [],
+        activity: []
+    }
+}
+
 chrome.runtime.onConnect.addListener(function (port) {
+    // track network activity
     if (port.name == "ats_devtools") {
         port.onMessage.addListener(function (msg) {
             const { url, method, body, postData, date, tabId } = msg
-            let existed = tabs.get(tabId)
-
-            if (!existed) {
-                existed = {
-                    network: [],
-                    mutation: []
-                }
-            }
+            let existed = ensureExist(tabId)
 
             existed.network.push({ url, method, body, postData, date })
             tabs.set(tabId, existed)
-
-            chrome.storage.local.get([`ats_${tabId}`], function (result) {
-                console.log('Value currently is ' + result.key);
-            });
 
             chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
 
@@ -79,4 +79,37 @@ chrome.runtime.onConnect.addListener(function (port) {
             console.log(existed)
         })
     }
-});
+    //track dom mutations
+    else if (port.name === 'ats_watch_dom_mutation') {
+        port.onMessage.addListener(function (msg) {
+            const { tabId, type, selector } = msg
+
+            let existed = ensureExist(tabId)
+
+            existed.mutation.push({ tabId, type, selector })
+            tabs.set(tabId, existed)
+
+            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+
+            console.log('receive mutation message, now the set is:')
+            console.log(existed)
+        })
+    }
+    //track user activities
+    else if (port.name === 'ats_watch_user_activities') {
+        port.onMessage.addListener(function (msg) {
+            const { tabId, target, keyCode, ctrlKey, shiftKey } = msg
+
+            let existed = ensureExist(tabId)
+
+            existed.activity.push({ target, keyCode, ctrlKey, shiftKey })
+            tabs.set(tabId, existed)
+
+            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+
+            console.log('receive user activity message, now the set is:')
+            console.log(existed)
+        })
+    }
+})
+
