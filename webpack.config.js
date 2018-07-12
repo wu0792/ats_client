@@ -1,10 +1,30 @@
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.js',
-    output: {
-        filename: 'main.js',
-        path: path.resolve(__dirname, 'dist')
+    entry: {
+        background: './src/ext/html/background.js',
+        content: './src/ext/html/content.js',
+        panel: './src/ext/html/panel.js'
     },
+    output: {
+        path: path.join(__dirname, 'build'),
+        filename: '[name].js'
+    },
+    optimization: {
+        minimizer: [
+            // new UglifyJsPlugin({
+            //     sourceMap: true,
+            //     test: /\.js($|\?)/i,
+            //     parallel: true
+            // })
+        ]
+    },
+    plugins: [
+        new CopyWebpackPlugin([
+            { from: './src/ext/manifest.json', to: './', force: true }
+        ], {})
+    ],
     watch: true
 };

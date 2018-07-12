@@ -67,7 +67,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     // track network activity
     if (port.name == "ats_devtools") {
         port.onMessage.addListener(function (msg) {
-            const { url, method, body, postData, date, tabId } = msg
+            const { url, method, body, postData, date, tabId = 0 } = msg
             let existed = ensureExist(tabId)
 
             existed.network.push({ url, method, body, postData, date })
@@ -82,11 +82,11 @@ chrome.runtime.onConnect.addListener(function (port) {
     //track dom mutations
     else if (port.name === 'ats_watch_dom_mutation') {
         port.onMessage.addListener(function (msg) {
-            const { tabId, type, selector } = msg
+            const { tabId = 0, type, target } = msg
 
             let existed = ensureExist(tabId)
 
-            existed.mutation.push({ tabId, type, selector })
+            existed.mutation.push({ tabId, type, target })
             tabs.set(tabId, existed)
 
             chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
@@ -98,7 +98,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     //track user activities
     else if (port.name === 'ats_watch_user_activities') {
         port.onMessage.addListener(function (msg) {
-            const { tabId, target, keyCode, ctrlKey, shiftKey } = msg
+            const { tabId = 0, target, keyCode, ctrlKey, shiftKey } = msg
 
             let existed = ensureExist(tabId)
 

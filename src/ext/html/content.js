@@ -1,3 +1,8 @@
+const Selector = require('css-selector-generator')
+const selector = new Selector()
+
+let currentTabId = 0
+
 function watchDomMutations() {
     var connection = chrome.runtime.connect({
         name: "ats_watch_dom_mutation"
@@ -5,8 +10,15 @@ function watchDomMutations() {
 
     var mutationObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
-            var a = 1
-            connection.postMessage({ tabId: 123, type: 'add', selector: '#abc' })
+            const targetSelector = selector.getSelector(mutation.target)
+
+            connection.postMessage({
+                type: mutation.type,
+                target: targetSelector,
+                addedNodes: mutation.addedNodes,
+                attributeName: mutation.attributeName,
+                removedNodes: mutation.removedNodes
+            })
         });
     })
 
@@ -34,7 +46,7 @@ function watchUserActivities() {
         */
 
         const { target, keyCode, ctrlKey, shiftKey } = ev
-        connection.postMessage({ tabId: 123, target: '#div1', keyCode, ctrlKey, shiftKey })
+        connection.postMessage({ target: selector.getSelector(ev.target), keyCode, ctrlKey, shiftKey })
     })
 }
 
