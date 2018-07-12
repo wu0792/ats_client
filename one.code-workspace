@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "src\\ext"
+		},
+		{
+			"path": "build"
 		}
 	],
 	"settings": {}

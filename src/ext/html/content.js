@@ -51,7 +51,21 @@ function watchUserActivities() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+
     watchDomMutations()
     watchUserActivities()
+
+    // chrome.runtime.onConnect.addListener(function (port) {
+    //     // track open devtools ats panel
+    //     if (port.name == "ats_devtools_content") {
+    //         port.onMessage.addListener(function (msg) {
+    //             const { tabId } = msg
+    //             currentTabId = tabId
+    //         })
+
+    //         watchDomMutations()
+    //         watchUserActivities()
+    //     }
+    // })
 })
 

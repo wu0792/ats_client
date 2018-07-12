@@ -65,7 +65,7 @@ function ensureExist(tabId) {
 
 chrome.runtime.onConnect.addListener(function (port) {
     // track network activity
-    if (port.name == "ats_devtools") {
+    if (port.name == "ats_devtools_background") {
         port.onMessage.addListener(function (msg) {
             const { url, method, body, postData, date, tabId = 0 } = msg
             let existed = ensureExist(tabId)

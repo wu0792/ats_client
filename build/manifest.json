@@ -2,7 +2,7 @@
   "name": "ATS",
   "version": "1.0",
   "description": "Auto Test Sprite 自动化测试录制工具",
-  "devtools_page": "./html/devtools.html",
+  "devtools_page": "./devtools.html",
   "permissions": [
     "tabs",
     "activeTab",

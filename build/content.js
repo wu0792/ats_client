@@ -81,12 +81,13 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */,
-/* 1 */
+/* 1 */,
+/* 2 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -95,7 +96,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -104,7 +105,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
@@ -406,7 +407,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
   })();
 
-  if ("function" !== "undefined" && __webpack_require__(2) !== null ? __webpack_require__(1) : void 0) {
+  if ("function" !== "undefined" && __webpack_require__(3) !== null ? __webpack_require__(2) : void 0) {
     !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return CssSelectorGenerator;
     }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -420,10 +421,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Selector = __webpack_require__(3)
+const Selector = __webpack_require__(4)
 const selector = new Selector()
 
 let currentTabId = 0
@@ -476,8 +477,22 @@ function watchUserActivities() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+
     watchDomMutations()
     watchUserActivities()
+
+    // chrome.runtime.onConnect.addListener(function (port) {
+    //     // track open devtools ats panel
+    //     if (port.name == "ats_devtools_content") {
+    //         port.onMessage.addListener(function (msg) {
+    //             const { tabId } = msg
+    //             currentTabId = tabId
+    //         })
+
+    //         watchDomMutations()
+    //         watchUserActivities()
+    //     }
+    // })
 })
 
 
