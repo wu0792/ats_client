@@ -436,16 +436,18 @@ function watchDomMutations() {
 
     var mutationObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
-            const targetSelector = selector.getSelector(mutation.target)
+            const targetSelector = mutation.target && mutation.target.parentNode ? selector.getSelector(mutation.target) : ''
 
-            connection.postMessage({
-                type: mutation.type,
-                target: targetSelector,
-                addedNodes: mutation.addedNodes,
-                attributeName: mutation.attributeName,
-                removedNodes: mutation.removedNodes
-            })
-        });
+            if (targetSelector) {
+                connection.postMessage({
+                    type: mutation.type,
+                    target: targetSelector,
+                    addedNodes: mutation.addedNodes,
+                    attributeName: mutation.attributeName,
+                    removedNodes: mutation.removedNodes
+                })
+            }
+        })
     })
 
     mutationObserver.observe(document.documentElement, {
@@ -471,8 +473,13 @@ function watchUserActivities() {
             ev.shiftKey:    false
         */
 
-        const { target, keyCode, ctrlKey, shiftKey } = ev
-        connection.postMessage({ target: selector.getSelector(ev.target), keyCode, ctrlKey, shiftKey })
+        const { target, keyCode, ctrlKey, shiftKey } = ev,
+            targetSelector = target && target.parentNode ? selector.getSelector(target) : ''
+
+        if (targetSelector) {
+            connection.postMessage({ target: selector.getSelector(target), keyCode, ctrlKey, shiftKey })
+        }
+
     })
 }
 
