@@ -81,68 +81,32 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 6:
-/***/ (function(module, exports) {
+/***/ 0:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-var mutationSet = new Map()
-/**
- * [
- *   1: {
- *      url: 'abc.com',
- *      mutaions: [
- *          {
- *              type: 'add',
- *              selector: '#searchBtn'
- *          }
- *      ]
- *   }
- * ]
- */
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_WATCH_PANEL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CONNECT_ID_WATCH_CONTENT; });
+const CONNECT_ID_WATCH_PANEL = 'CONNECT_ID_WATCH_PANEL'
+const CONNECT_ID_WATCH_CONTENT = 'CONNECT_ID_WATCH_CONTENT'
 
-function getActiveTab(cb) {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        if (tabs.length) {
-            var activeTab = tabs[0]
+/***/ }),
 
-            cb({ id: activeTab.id, url: activeTab.url })
-        }
-    })
-}
+/***/ 7:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        if (request.ats_domMutation === true) {
-            let cb = function ({ id, url }) {
-                let existed = mutationSet.get(id)
-                if (!existed) {
-                    existed = {
-                        url,
-                        mutation: []
-                    }
-                }
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 
-                existed.mutation.push({
-                    time: new Date(),
-                    type: 'add',
-                    selector: '#btn123'
-                })
 
-                mutationSet.set(id, existed)
-
-                console.log('receive mutation message, now the set is:')
-                console.log(mutationSet)
-            }
-
-            getActiveTab(cb)
-        }
-    });
-
-var tabs = new Map()
+let tabs = new Map(),
+    activeTabId = 0
 
 function ensureExist(tabId) {
     let existed = tabs.get(tabId)
@@ -155,52 +119,57 @@ function ensureExist(tabId) {
 }
 
 chrome.runtime.onConnect.addListener(function (port) {
-    // track network activity
-    if (port.name == "ats_devtools_background") {
-        port.onMessage.addListener(function (msg) {
-            const { url, method, body, postData, date, tabId = 0 } = msg
-            let existed = ensureExist(tabId)
+    switch (port.name) {
+        case _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_PANEL */ "b"]:
+            port.onMessage.addListener(function (msg) {
+                const { action, url, method, body, postData, date, tabId = 0 } = msg
 
-            existed.network.push({ url, method, body, postData, date })
-            tabs.set(tabId, existed)
+                if (action === 'init' && tabId) {
+                    activeTabId = tabId
+                } else if (action === 'listen' && activeTabId) {
+                    let existed = ensureExist(activeTabId)
 
-            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+                    existed.network.push({ url, method, body, postData, date })
+                    tabs.set(activeTabId, existed)
 
-            console.log('receive network message, now the set is:')
-            console.log(existed)
-        })
-    }
-    //track dom mutations
-    else if (port.name === 'ats_watch_dom_mutation') {
-        port.onMessage.addListener(function (msg) {
-            const { tabId = 0, type, target } = msg
+                    chrome.storage.local.set({ [`ats_${activeTabId}`]: { data: existed, update_at: new Date() } })
 
-            let existed = ensureExist(tabId)
+                    console.log('receive network message, now the set is:')
+                    console.log(existed)
+                } else if (action === 'stop') {
+                    console.log('background.js receive stop action from panel.')
+                }
+            })
+            break
+        // track network activity
+        case _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_CONTENT */ "a"]:
+            port.onMessage.addListener(function (msg) {
+                let action = msg.action
+                if (action === 'user_activities') {
+                    const { target, keyCode, ctrlKey, shiftKey, altKey } = msg
 
-            existed.mutation.push({ tabId, type, target })
-            tabs.set(tabId, existed)
+                    let existed = ensureExist(activeTabId)
 
-            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
+                    existed.activity.push({ target, keyCode, ctrlKey, shiftKey, altKey })
+                    tabs.set(activeTabId, existed)
 
-            console.log('receive mutation message, now the set is:')
-            console.log(existed)
-        })
-    }
-    //track user activities
-    else if (port.name === 'ats_watch_user_activities') {
-        port.onMessage.addListener(function (msg) {
-            const { tabId = 0, target, keyCode, ctrlKey, shiftKey } = msg
+                    console.log('receive user activity message, now the set is:')
+                    console.log(existed)
+                } else if (action === 'dom_mutation') {
+                    const { type, target } = msg
 
-            let existed = ensureExist(tabId)
+                    let existed = ensureExist(activeTabId)
 
-            existed.activity.push({ target, keyCode, ctrlKey, shiftKey })
-            tabs.set(tabId, existed)
+                    existed.mutation.push({ activeTabId, type, target })
+                    tabs.set(activeTabId, existed)
 
-            chrome.storage.local.set({ [`ats_${tabId}`]: { data: existed, update_at: new Date() } })
-
-            console.log('receive user activity message, now the set is:')
-            console.log(existed)
-        })
+                    console.log('receive mutation message, now the set is:')
+                    console.log(existed)
+                }
+            })
+            break
+        default:
+            break
     }
 })
 

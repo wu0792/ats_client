@@ -81,31 +81,133 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
-/* 1 */
-/***/ (function(module, exports) {
+/* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-//notify background
-var connectionToBackground = chrome.runtime.connect({ name: "ats_devtools_background" })
-var connectionToContent = chrome.runtime.connect({ name: "ats_devtools_content" })
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_WATCH_PANEL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CONNECT_ID_WATCH_CONTENT; });
+const CONNECT_ID_WATCH_PANEL = 'CONNECT_ID_WATCH_PANEL'
+const CONNECT_ID_WATCH_CONTENT = 'CONNECT_ID_WATCH_CONTENT'
 
-connectionToContent.postMessage({ tabId: chrome.devtools.inspectedWindow.tabId })
+/***/ }),
+/* 1 */,
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-chrome.devtools.network.onRequestFinished.addListener(
-    function (request) {
-        request.getContent(function (content) {
-            const { request: innerRequest, startedDateTime: date } = request,
-                { url, postData, method } = innerRequest,
-                body = content,
-                tabId = chrome.devtools.inspectedWindow.tabId
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 
-            connectionToBackground.postMessage({ type: 'network.request', url, method, body, postData, date, tabId })
+
+let logRoot = null,
+    errorRoot = null
+
+function createDiv(text, className) {
+    let div = document.createElement('div')
+    div.innerText = `${new Date()}:${text}`
+    className && div.setAttribute('class', className)
+
+    return div
+}
+
+function appendLog(log) {
+    logRoot && logRoot.appendChild(createDiv(log))
+}
+
+function appendError(error) {
+    errorRoot && errorRoot.appendChild(createDiv(error))
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    logRoot = document.getElementById('logRoot')
+    errorRoot = document.getElementById('errorRoot')
+
+    let isRuning = false,
+        tabId = chrome.devtools.inspectedWindow.tabId
+
+    const btnStart = document.getElementById('btnStart'),
+        btnStop = document.getElementById('btnStop')
+
+    let
+        //notify init background and content
+        connectionWatchPanel = null,
+        stopNetworkRequestFinishedListen = null
+    // connectionInitContent = null,
+    //notify unlink background and content
+    // connectionStopBackground = null
+    // connectionStopContent = null
+
+
+    btnStart.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
+
+        btnStart.disabled = true
+        btnStop.disabled = false
+        isRuning = true
+
+        connectionWatchPanel = chrome.runtime.connect({ name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_PANEL */ "b"] })
+
+        chrome.tabs.sendMessage(tabId, { name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_PANEL */ "b"], action: 'start' }, () => {
+            appendLog('开始监听...')
+
+            connectionWatchPanel.postMessage({ action: 'init', tabId })
+            watchNetwork()
         })
     })
+
+    function watchNetwork() {
+        if (connectionWatchPanel) {
+            appendLog('开始网络监听')
+            stopNetworkRequestFinishedListen = false
+            chrome.devtools.network.onRequestFinished.addListener(
+                function (request) {
+                    if (!stopNetworkRequestFinishedListen) {
+                        request.getContent(function (content) {
+                            const { request: innerRequest, startedDateTime: date } = request,
+                                { url, postData, method } = innerRequest,
+                                body = content
+
+                            connectionWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
+                        })
+                    }
+                })
+        } else {
+            appendError('connectionWatchPanel为空，不能启动监听网络，可能尚未启动初始化')
+        }
+    }
+
+    function stopWatchNetwork() {
+        if (!stopNetworkRequestFinishedListen) {
+            appendLog('停止网络监听')
+            stopNetworkRequestFinishedListen = true
+        } else {
+            appendError('无法停止监听网络，因为当前不是监听状态')
+        }
+    }
+
+    btnStop.addEventListener('click', (ev) => {
+        if (!isRuning) {
+            return
+        }
+
+        btnStart.disabled = false
+        btnStop.disabled = true
+        isRuning = false
+
+        stopWatchNetwork()
+        connectionWatchPanel && connectionWatchPanel.postMessage({ action: 'stop' })
+        chrome.tabs.sendMessage(tabId, { action: 'stop', name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_PANEL */ "b"] }, () => {
+            appendLog('停止监听...')
+        })
+    })
+})
 
 /***/ })
 /******/ ]);

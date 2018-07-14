@@ -81,13 +81,23 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
+/* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_WATCH_PANEL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CONNECT_ID_WATCH_CONTENT; });
+const CONNECT_ID_WATCH_PANEL = 'CONNECT_ID_WATCH_PANEL'
+const CONNECT_ID_WATCH_CONTENT = 'CONNECT_ID_WATCH_CONTENT'
+
+/***/ }),
 /* 1 */,
-/* 2 */
+/* 2 */,
+/* 3 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -96,7 +106,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -105,7 +115,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
@@ -407,7 +417,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
   })();
 
-  if ("function" !== "undefined" && __webpack_require__(3) !== null ? __webpack_require__(2) : void 0) {
+  if ("function" !== "undefined" && __webpack_require__(4) !== null ? __webpack_require__(3) : void 0) {
     !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return CssSelectorGenerator;
     }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -421,25 +431,32 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Selector = __webpack_require__(4)
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+
+const Selector = __webpack_require__(5)
 const selector = new Selector()
 
-let currentTabId = 0
+let domHasLoaded = false,
+    mutationObserver = null
 
+const connectionWatchContent = chrome.runtime.connect({ name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_CONTENT */ "a"] })
+
+// watch dom modification
 function watchDomMutations() {
-    var connection = chrome.runtime.connect({
-        name: "ats_watch_dom_mutation"
-    })
-
-    var mutationObserver = new MutationObserver(function (mutations) {
+    mutationObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
-            const targetSelector = mutation.target && mutation.target.parentNode ? selector.getSelector(mutation.target) : ''
+            const target = mutation.target,
+                targetSelector = target && target.getRootNode() === document ? selector.getSelector(mutation.target) : ''
 
             if (targetSelector) {
-                connection.postMessage({
+                connectionWatchContent.postMessage({
+                    action: 'dom_mutation',
                     type: mutation.type,
                     target: targetSelector,
                     addedNodes: mutation.addedNodes,
@@ -460,49 +477,66 @@ function watchDomMutations() {
     })
 }
 
-function watchUserActivities() {
-    var connection = chrome.runtime.connect({
-        name: "ats_watch_user_activities"
-    })
+// stop watch dom modification
+function stopWatchDomMutations() {
+    if (mutationObserver) {
+        mutationObserver.disconnect()
+    }
+}
 
-    document.addEventListener('keydown', function (ev) {
-        /*
-            ev.target:      <input id=​"kw" name=​"wd" class=​"s_ipt" value maxlength=​"255" autocomplete=​"off">​
-            ev.keyCode:     96
-            ev.ctrlKey:     false
-            ev.shiftKey:    false
-        */
+function doListenUserKeydown(ev) {
+    const { target, keyCode, ctrlKey, shiftKey, altKey } = ev,
+        targetSelector = target && target.getRootNode() === document ? selector.getSelector(target) : ''
 
-        const { target, keyCode, ctrlKey, shiftKey } = ev,
-            targetSelector = target && target.parentNode ? selector.getSelector(target) : ''
+    if (targetSelector) {
+        connectionWatchContent.postMessage({ action: 'user_activities', target: targetSelector, keyCode, ctrlKey, shiftKey, altKey })
+    }
+}
 
-        if (targetSelector) {
-            connection.postMessage({ target: selector.getSelector(target), keyCode, ctrlKey, shiftKey })
-        }
+//watch user input, hover
+function watchUserActivity() {
+    document.addEventListener('keydown', doListenUserKeydown)
+}
 
-    })
+//watch user input, hover
+function stopWatchUserActivity() {
+    document.removeEventListener('keydown', doListenUserKeydown)
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-
-    watchDomMutations()
-    watchUserActivities()
-
-    // chrome.runtime.onConnect.addListener(function (port) {
-    //     // track open devtools ats panel
-    //     if (port.name == "ats_devtools_content") {
-    //         port.onMessage.addListener(function (msg) {
-    //             const { tabId } = msg
-    //             currentTabId = tabId
-    //         })
-
-    //         watchDomMutations()
-    //         watchUserActivities()
-    //     }
-    // })
+    domHasLoaded = true
 })
 
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        switch (request.name) {
+            case _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_WATCH_PANEL */ "b"]:
+                switch (request.action) {
+                    case 'start':
+                        console.log('start listen dom mutation and user activities')
 
+                        if (domHasLoaded) {
+                            watchDomMutations()
+                            watchUserActivity()
+                        } else {
+                            document.addEventListener('DOMContentLoaded', function () {
+                                domHasLoaded = true
+
+                                watchDomMutations()
+                                watchUserActivity()
+                            })
+                        }
+                        break
+                    case 'stop':
+                        console.log('content stop watch dom mutation and user activities')
+                        stopWatchDomMutations()
+                        stopWatchUserActivity()
+                        break
+                    default:
+                        break
+                }
+        }
+    })
 
 /***/ })
 /******/ ]);
