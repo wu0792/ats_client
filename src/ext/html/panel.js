@@ -1,7 +1,8 @@
-import * as CONNECT_ID from './consts'
+import * as CONSTS from './consts'
 
-let logRoot = null,
-    errorRoot = null
+let logs = null,
+    errors = null,
+    records = null
 
 function createDiv(text, className) {
     let div = document.createElement('div')
@@ -12,16 +13,21 @@ function createDiv(text, className) {
 }
 
 function appendLog(log) {
-    logRoot && logRoot.appendChild(createDiv(log))
+    logs && logs.appendChild(createDiv(log))
 }
 
 function appendError(error) {
-    errorRoot && errorRoot.appendChild(createDiv(error))
+    errors && errors.appendChild(createDiv(error))
+}
+
+function appendRecord(type, record) {
+    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    logRoot = document.getElementById('logRoot')
-    errorRoot = document.getElementById('errorRoot')
+    logs = document.getElementById('logs')
+    errors = document.getElementById('errors')
+    records = document.getElementById('records')
 
     let isRuning = false,
         tabId = chrome.devtools.inspectedWindow.tabId
@@ -29,15 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop')
 
-    let
-        //notify init background and content
-        connectionWatchPanel = null,
+    let connectionRuntimeWatchPanel = null,
+        connectionTabsWatchPanel = null,
         stopNetworkRequestFinishedListen = null
-    // connectionInitContent = null,
-    //notify unlink background and content
-    // connectionStopBackground = null
-    // connectionStopContent = null
-
 
     btnStart.addEventListener('click', (ev) => {
         if (isRuning) {
@@ -48,29 +48,59 @@ document.addEventListener('DOMContentLoaded', function () {
         btnStop.disabled = false
         isRuning = true
 
-        connectionWatchPanel = chrome.runtime.connect({ name: CONNECT_ID.CONNECT_ID_WATCH_PANEL })
+        if (!connectionRuntimeWatchPanel) {
+            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_INIT_PANEL })
+        }
 
-        chrome.tabs.sendMessage(tabId, { name: CONNECT_ID.CONNECT_ID_WATCH_PANEL, action: 'start' }, () => {
-            appendLog('开始监听...')
+        if (!connectionTabsWatchPanel) {
+            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: CONSTS.CONNECT_ID_INIT_PANEL })
+        }
 
-            connectionWatchPanel.postMessage({ action: 'init', tabId })
-            watchNetwork()
+        connectionRuntimeWatchPanel.postMessage({ action: 'init', tabId })
+        connectionTabsWatchPanel.postMessage({ action: 'init', tabId })
+
+        watchNetwork()
+
+        connectionTabsWatchPanel.onMessage.addListener(function (request) {
+            switch (request.action) {
+                case CONSTS.ACTION_TYPES.DOM_MUTATION.key:
+                    appendRecord(CONSTS.ACTION_TYPES.DOM_MUTATION, request)
+                    break
+                case CONSTS.ACTION_TYPES.USER_ACTIVITY.key:
+                    appendRecord(CONSTS.ACTION_TYPES.USER_ACTIVITY, request)
+                    break
+                default:
+                    break
+            }
         })
+
+        // chrome.runtime.onMessage.addListener(function (request) {
+        //     switch (request.name) {
+        //         case CONSTS.CONNECT_ID_WATCH_DOM_MUTATION:
+        //             appendRecord(CONSTS.ACTION_TYPES.DOM_MUTATION, request.message)
+        //             break
+        //         case CONSTS.CONNECT_ID_WATCH_USER_ACTIVITY:
+        //             appendRecord(CONSTS.ACTION_TYPES.USER_ACTIVITY, request.message)
+        //             break
+        //     }
+        // })
     })
 
     function watchNetwork() {
-        if (connectionWatchPanel) {
+        if (connectionRuntimeWatchPanel) {
             appendLog('开始网络监听')
             stopNetworkRequestFinishedListen = false
             chrome.devtools.network.onRequestFinished.addListener(
                 function (request) {
+                    //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
                             const { request: innerRequest, startedDateTime: date } = request,
                                 { url, postData, method } = innerRequest,
                                 body = content
 
-                            connectionWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
+                            connectionRuntimeWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
+                            appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, postData, date })
                         })
                     }
                 })
@@ -98,9 +128,10 @@ document.addEventListener('DOMContentLoaded', function () {
         isRuning = false
 
         stopWatchNetwork()
-        connectionWatchPanel && connectionWatchPanel.postMessage({ action: 'stop' })
-        chrome.tabs.sendMessage(tabId, { action: 'stop', name: CONNECT_ID.CONNECT_ID_WATCH_PANEL }, () => {
-            appendLog('停止监听...')
-        })
+
+        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'stop' })
+        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'stop' })
+
+        appendLog('停止监听...')
     })
 })

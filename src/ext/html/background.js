@@ -1,4 +1,4 @@
-import * as CONNECT_ID from './consts'
+import * as CONSTS from './consts'
 
 let tabs = new Map(),
     activeTabId = 0
@@ -15,7 +15,7 @@ function ensureExist(tabId) {
 
 chrome.runtime.onConnect.addListener(function (port) {
     switch (port.name) {
-        case CONNECT_ID.CONNECT_ID_WATCH_PANEL:
+        case CONSTS.CONNECT_ID_INIT_PANEL:
             port.onMessage.addListener(function (msg) {
                 const { action, url, method, body, postData, date, tabId = 0 } = msg
 
@@ -37,10 +37,10 @@ chrome.runtime.onConnect.addListener(function (port) {
             })
             break
         // track network activity
-        case CONNECT_ID.CONNECT_ID_WATCH_CONTENT:
+        case CONSTS.CONNECT_ID_INIT_CONTENT:
             port.onMessage.addListener(function (msg) {
                 let action = msg.action
-                if (action === 'user_activities') {
+                if (action === CONSTS.ACTION_TYPES.USER_ACTIVITY.key) {
                     const { target, keyCode, ctrlKey, shiftKey, altKey } = msg
 
                     let existed = ensureExist(activeTabId)
@@ -50,7 +50,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                     console.log('receive user activity message, now the set is:')
                     console.log(existed)
-                } else if (action === 'dom_mutation') {
+                } else if (action === CONSTS.ACTION_TYPES.DOM_MUTATION.key) {
                     const { type, target } = msg
 
                     let existed = ensureExist(activeTabId)
