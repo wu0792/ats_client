@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,7 +94,7 @@
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
-/* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(enum__WEBPACK_IMPORTED_MODULE_0__);
 
 
@@ -110,176 +110,62 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                 methodFragmentStr = method === 'POST' ? `postData:${postData}, ` : ''
 
             return `网络请求: url:${url}, method:${method}, ${methodFragmentStr}reponse: ${body}, date:${date}`
+        },
+        key: 'network',
+        wrapMessage: (msg) => {
+            const { url, method, body, postData, date } = msg
+            return { url, method, body, postData, date }
         }
     },
     DOM_MUTATION: {
         renderTitle: (record) => {
             const { type, target, addedNodes, attributeName, removedNodes } = record
 
-            return `dom修改: ${JSON.stringify(record)}`
+            return `dom: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { type, target } = msg
+            return { type, target }
         }
     },
-    USER_ACTIVITY: {
+    USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
-            return `界面操作: ${JSON.stringify(record)}`
+            return `KeyDown: ${JSON.stringify(record)}`
+        },
+        key: 'keydown',
+        wrapMessage: (msg) => {
+            const { target, keyCode, ctrlKey, shiftKey, altKey } = msg
+            return { target, keyCode, ctrlKey, shiftKey, altKey }
         }
-    }
+    },
+    USER_ACTIVITY_CLICK: {
+        renderTitle: (record) => {
+            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
+            return `Click: ${JSON.stringify(record)}`
+        },
+        key: 'click',
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        }
+    },
+    USER_ACTIVITY_SCROLL: {
+        renderTitle: (record) => {
+            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
+            return `Click: ${JSON.stringify(record)}`
+        },
+        key: 'scroll',
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        }
+    },
 })
 
 /***/ }),
-/* 1 */,
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-
-
-let logs = null,
-    errors = null,
-    records = null
-
-function createDiv(text, className) {
-    let div = document.createElement('div')
-    div.innerText = `${new Date()}:${text}`
-    className && div.setAttribute('class', className)
-
-    return div
-}
-
-function appendLog(log) {
-    logs && logs.appendChild(createDiv(log))
-}
-
-function appendError(error) {
-    errors && errors.appendChild(createDiv(error))
-}
-
-function appendRecord(type, record) {
-    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    logs = document.getElementById('logs')
-    errors = document.getElementById('errors')
-    records = document.getElementById('records')
-
-    let isRuning = false,
-        tabId = chrome.devtools.inspectedWindow.tabId
-
-    const btnStart = document.getElementById('btnStart'),
-        btnStop = document.getElementById('btnStop')
-
-    let connectionRuntimeWatchPanel = null,
-        connectionTabsWatchPanel = null,
-        stopNetworkRequestFinishedListen = null
-
-    btnStart.addEventListener('click', (ev) => {
-        if (isRuning) {
-            return
-        }
-
-        btnStart.disabled = true
-        btnStop.disabled = false
-        isRuning = true
-
-        if (!connectionRuntimeWatchPanel) {
-            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
-        }
-
-        if (!connectionTabsWatchPanel) {
-            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
-        }
-
-        connectionRuntimeWatchPanel.postMessage({ action: 'init', tabId })
-        connectionTabsWatchPanel.postMessage({ action: 'init', tabId })
-
-        watchNetwork()
-
-        connectionTabsWatchPanel.onMessage.addListener(function (request) {
-            switch (request.action) {
-                case _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].DOM_MUTATION.key:
-                    appendRecord(_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].DOM_MUTATION, request)
-                    break
-                case _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].USER_ACTIVITY.key:
-                    appendRecord(_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].USER_ACTIVITY, request)
-                    break
-                default:
-                    break
-            }
-        })
-
-        // chrome.runtime.onMessage.addListener(function (request) {
-        //     switch (request.name) {
-        //         case CONSTS.CONNECT_ID_WATCH_DOM_MUTATION:
-        //             appendRecord(CONSTS.ACTION_TYPES.DOM_MUTATION, request.message)
-        //             break
-        //         case CONSTS.CONNECT_ID_WATCH_USER_ACTIVITY:
-        //             appendRecord(CONSTS.ACTION_TYPES.USER_ACTIVITY, request.message)
-        //             break
-        //     }
-        // })
-    })
-
-    function watchNetwork() {
-        if (connectionRuntimeWatchPanel) {
-            appendLog('开始网络监听')
-            stopNetworkRequestFinishedListen = false
-            chrome.devtools.network.onRequestFinished.addListener(
-                function (request) {
-                    //启用状态才需要继续
-                    if (!stopNetworkRequestFinishedListen) {
-                        request.getContent(function (content) {
-                            const { request: innerRequest, startedDateTime: date } = request,
-                                { url, postData, method } = innerRequest,
-                                body = content
-
-                            connectionRuntimeWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
-                            appendRecord(_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK, { url, method, body, postData, date })
-                        })
-                    }
-                })
-        } else {
-            appendError('connectionWatchPanel为空，不能启动监听网络，可能尚未启动初始化')
-        }
-    }
-
-    function stopWatchNetwork() {
-        if (!stopNetworkRequestFinishedListen) {
-            appendLog('停止网络监听')
-            stopNetworkRequestFinishedListen = true
-        } else {
-            appendError('无法停止监听网络，因为当前不是监听状态')
-        }
-    }
-
-    btnStop.addEventListener('click', (ev) => {
-        if (!isRuning) {
-            return
-        }
-
-        btnStart.disabled = false
-        btnStop.disabled = true
-        isRuning = false
-
-        stopWatchNetwork()
-
-        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'stop' })
-        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'stop' })
-
-        appendLog('停止监听...')
-    })
-})
-
-/***/ }),
-/* 3 */,
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -304,14 +190,14 @@ var isNumber = function (value) {
 exports.isNumber = isNumber;
 
 /***/ }),
-/* 9 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(15);
+module.exports = __webpack_require__(8);
 
 
 /***/ }),
-/* 10 */
+/* 3 */
 /***/ (function(module, exports) {
 
 /*!
@@ -338,7 +224,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 11 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -355,7 +241,7 @@ var indexOf = Array.prototype.indexOf || function (find, i /*opt*/) {
 exports.indexOf = indexOf;
 
 /***/ }),
-/* 12 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -363,7 +249,7 @@ exports.indexOf = indexOf;
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var _isType = __webpack_require__(8);
+var _isType = __webpack_require__(1);
 
 var isObject = _isType.isObject;
 var isString = _isType.isString;
@@ -465,7 +351,7 @@ var EnumItem = (function () {
 module.exports = EnumItem;
 
 /***/ }),
-/* 13 */
+/* 6 */
 /***/ (function(module, exports) {
 
 exports.endianness = function () { return 'LE' };
@@ -520,7 +406,7 @@ exports.homedir = function () {
 
 
 /***/ }),
-/* 14 */
+/* 7 */
 /***/ (function(module, exports) {
 
 var g;
@@ -546,7 +432,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 15 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -556,18 +442,18 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var os = _interopRequire(__webpack_require__(13));
+var os = _interopRequire(__webpack_require__(6));
 
-var EnumItem = _interopRequire(__webpack_require__(12));
+var EnumItem = _interopRequire(__webpack_require__(5));
 
-var _isType = __webpack_require__(8);
+var _isType = __webpack_require__(1);
 
 var isString = _isType.isString;
 var isNumber = _isType.isNumber;
 
-var indexOf = __webpack_require__(11).indexOf;
+var indexOf = __webpack_require__(4).indexOf;
 
-var isBuffer = _interopRequire(__webpack_require__(10));
+var isBuffer = _interopRequire(__webpack_require__(3));
 
 var endianness = os.endianness();
 
@@ -921,7 +807,136 @@ function guardReservedKeys(customName, key) {
     throw new Error("Enum key " + key + " is a reserved word!");
   }
 }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)))
+
+/***/ }),
+/* 9 */,
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+
+let logs = null,
+    errors = null,
+    records = null
+
+function createDiv(text, className) {
+    let div = document.createElement('div')
+    div.innerText = `${new Date()}:${text}`
+    className && div.setAttribute('class', className)
+
+    return div
+}
+
+function appendLog(log) {
+    logs && logs.appendChild(createDiv(log))
+}
+
+function appendError(error) {
+    errors && errors.appendChild(createDiv(error))
+}
+
+function appendRecord(type, record) {
+    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    logs = document.getElementById('logs')
+    errors = document.getElementById('errors')
+    records = document.getElementById('records')
+
+    let isRuning = false,
+        tabId = chrome.devtools.inspectedWindow.tabId
+
+    const btnStart = document.getElementById('btnStart'),
+        btnStop = document.getElementById('btnStop')
+
+    let connectionRuntimeWatchPanel = null,
+        connectionTabsWatchPanel = null,
+        stopNetworkRequestFinishedListen = null
+
+    btnStart.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
+
+        btnStart.disabled = true
+        btnStop.disabled = false
+        isRuning = true
+
+        if (!connectionRuntimeWatchPanel) {
+            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
+        }
+
+        if (!connectionTabsWatchPanel) {
+            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
+        }
+
+        connectionRuntimeWatchPanel.postMessage({ action: 'init', tabId })
+        connectionTabsWatchPanel.postMessage({ action: 'init', tabId })
+
+        watchNetwork()
+
+        connectionTabsWatchPanel.onMessage.addListener(function (request) {
+            const theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(request.action)
+            if (theActionEnum) {
+                appendRecord(theActionEnum, request)
+            }
+        })
+    })
+
+    function watchNetwork() {
+        if (connectionRuntimeWatchPanel) {
+            appendLog('开始网络监听')
+            stopNetworkRequestFinishedListen = false
+            chrome.devtools.network.onRequestFinished.addListener(
+                function (request) {
+                    //启用状态才需要继续
+                    if (!stopNetworkRequestFinishedListen) {
+                        request.getContent(function (content) {
+                            const { request: innerRequest, startedDateTime: date } = request,
+                                { url, postData, method } = innerRequest,
+                                body = content
+
+                            connectionRuntimeWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
+                            appendRecord(_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK, { url, method, body, postData, date })
+                        })
+                    }
+                })
+        } else {
+            appendError('connectionWatchPanel为空，不能启动监听网络，可能尚未启动初始化')
+        }
+    }
+
+    function stopWatchNetwork() {
+        if (!stopNetworkRequestFinishedListen) {
+            appendLog('停止网络监听')
+            stopNetworkRequestFinishedListen = true
+        } else {
+            appendError('无法停止监听网络，因为当前不是监听状态')
+        }
+    }
+
+    btnStop.addEventListener('click', (ev) => {
+        if (!isRuning) {
+            return
+        }
+
+        btnStart.disabled = false
+        btnStop.disabled = true
+        isRuning = false
+
+        stopWatchNetwork()
+
+        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'stop' })
+        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'stop' })
+
+        appendLog('停止监听...')
+    })
+})
 
 /***/ })
 /******/ ]);

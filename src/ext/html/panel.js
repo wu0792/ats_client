@@ -62,28 +62,11 @@ document.addEventListener('DOMContentLoaded', function () {
         watchNetwork()
 
         connectionTabsWatchPanel.onMessage.addListener(function (request) {
-            switch (request.action) {
-                case CONSTS.ACTION_TYPES.DOM_MUTATION.key:
-                    appendRecord(CONSTS.ACTION_TYPES.DOM_MUTATION, request)
-                    break
-                case CONSTS.ACTION_TYPES.USER_ACTIVITY.key:
-                    appendRecord(CONSTS.ACTION_TYPES.USER_ACTIVITY, request)
-                    break
-                default:
-                    break
+            const theActionEnum = CONSTS.ACTION_TYPES.get(request.action)
+            if (theActionEnum) {
+                appendRecord(theActionEnum, request)
             }
         })
-
-        // chrome.runtime.onMessage.addListener(function (request) {
-        //     switch (request.name) {
-        //         case CONSTS.CONNECT_ID_WATCH_DOM_MUTATION:
-        //             appendRecord(CONSTS.ACTION_TYPES.DOM_MUTATION, request.message)
-        //             break
-        //         case CONSTS.CONNECT_ID_WATCH_USER_ACTIVITY:
-        //             appendRecord(CONSTS.ACTION_TYPES.USER_ACTIVITY, request.message)
-        //             break
-        //     }
-        // })
     })
 
     function watchNetwork() {

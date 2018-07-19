@@ -55,7 +55,29 @@ function doListenUserKeydown(ev) {
         targetSelector = target && target.getRootNode() === document ? selector.getSelector(target) : ''
 
     if (targetSelector) {
-        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY.key, target: targetSelector, keyCode, ctrlKey, shiftKey, altKey }
+        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_KEYDOWN.key, target: targetSelector, keyCode, ctrlKey, shiftKey, altKey }
+        connContentAndBackground.postMessage(message)
+        connContentAndPanel.postMessage(message)
+    }
+}
+
+function doListenUserClick(ev) {
+    const { target } = ev,
+        targetSelector = target && target.getRootNode() === document ? selector.getSelector(target) : ''
+
+    if (targetSelector) {
+        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_CLICK.key, target: targetSelector }
+        connContentAndBackground.postMessage(message)
+        connContentAndPanel.postMessage(message)
+    }
+}
+
+function doListenUserScroll(ev) {
+    const { target } = ev,
+        targetSelector = target && target.getRootNode() === document ? selector.getSelector(target) : ''
+
+    if (targetSelector) {
+        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_SCROLL.key, target: targetSelector }
         connContentAndBackground.postMessage(message)
         connContentAndPanel.postMessage(message)
     }
@@ -64,11 +86,15 @@ function doListenUserKeydown(ev) {
 //watch user input, hover
 function watchUserActivity() {
     document.addEventListener('keydown', doListenUserKeydown)
+    document.addEventListener('click', doListenUserClick)
+    document.addEventListener('scroll', doListenUserScroll)
 }
 
 //watch user input, hover
 function stopWatchUserActivity() {
     document.removeEventListener('keydown', doListenUserKeydown)
+    document.removeEventListener('click', doListenUserClick)
+    document.removeEventListener('scroll', doListenUserScroll)
 }
 
 document.addEventListener('DOMContentLoaded', function () {

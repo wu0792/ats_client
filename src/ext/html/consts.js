@@ -12,19 +12,56 @@ export const ACTION_TYPES = new Enum({
                 methodFragmentStr = method === 'POST' ? `postData:${postData}, ` : ''
 
             return `网络请求: url:${url}, method:${method}, ${methodFragmentStr}reponse: ${body}, date:${date}`
+        },
+        key: 'network',
+        wrapMessage: (msg) => {
+            const { url, method, body, postData, date } = msg
+            return { url, method, body, postData, date }
         }
     },
     DOM_MUTATION: {
         renderTitle: (record) => {
             const { type, target, addedNodes, attributeName, removedNodes } = record
 
-            return `dom修改: ${JSON.stringify(record)}`
+            return `dom: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { type, target } = msg
+            return { type, target }
         }
     },
-    USER_ACTIVITY: {
+    USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
-            return `界面操作: ${JSON.stringify(record)}`
+            return `KeyDown: ${JSON.stringify(record)}`
+        },
+        key: 'keydown',
+        wrapMessage: (msg) => {
+            const { target, keyCode, ctrlKey, shiftKey, altKey } = msg
+            return { target, keyCode, ctrlKey, shiftKey, altKey }
         }
-    }
+    },
+    USER_ACTIVITY_CLICK: {
+        renderTitle: (record) => {
+            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
+            return `Click: ${JSON.stringify(record)}`
+        },
+        key: 'click',
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        }
+    },
+    USER_ACTIVITY_SCROLL: {
+        renderTitle: (record) => {
+            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
+            return `Click: ${JSON.stringify(record)}`
+        },
+        key: 'scroll',
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        }
+    },
 })
