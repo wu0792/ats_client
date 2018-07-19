@@ -72,12 +72,22 @@ function doListenUserClick(ev) {
     }
 }
 
+let lastScrollDate = null
+const commonThreshold = 500
 function doListenUserScroll(ev) {
-    const { target } = ev,
-        targetSelector = target && target.getRootNode() === document ? selector.getSelector(target) : ''
+    if (lastScrollDate === null || (new Date() - lastScrollDate) >= commonThreshold) {
+        lastScrollDate = new Date()
+        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_SCROLL.key, scrollX, scrollY }
+        connContentAndBackground.postMessage(message)
+        connContentAndPanel.postMessage(message)
+    }
+}
 
-    if (targetSelector) {
-        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_SCROLL.key, target: targetSelector }
+let lastResizeDate = null
+function doListenUserResize(ev) {
+    if (lastResizeDate === null || (new Date() - lastResizeDate) >= commonThreshold) {
+        lastResizeDate = new Date()
+        const message = { action: CONSTS.ACTION_TYPES.USER_ACTIVITY_RESIZE.key, innerWidth, innerHeight }
         connContentAndBackground.postMessage(message)
         connContentAndPanel.postMessage(message)
     }
@@ -87,14 +97,16 @@ function doListenUserScroll(ev) {
 function watchUserActivity() {
     document.addEventListener('keydown', doListenUserKeydown)
     document.addEventListener('click', doListenUserClick)
-    document.addEventListener('scroll', doListenUserScroll)
+    window.addEventListener('scroll', doListenUserScroll)
+    window.addEventListener('resize', doListenUserResize)
 }
 
 //watch user input, hover
 function stopWatchUserActivity() {
     document.removeEventListener('keydown', doListenUserKeydown)
     document.removeEventListener('click', doListenUserClick)
-    document.removeEventListener('scroll', doListenUserScroll)
+    window.removeEventListener('scroll', doListenUserScroll)
+    window.removeEventListener('resize', doListenUserResize)
 }
 
 document.addEventListener('DOMContentLoaded', function () {

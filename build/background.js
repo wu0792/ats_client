@@ -154,12 +154,23 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     USER_ACTIVITY_SCROLL: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
-            return `Click: ${JSON.stringify(record)}`
+            return `Scroll: ${JSON.stringify(record)}`
         },
         key: 'scroll',
         wrapMessage: (msg) => {
-            const { target } = msg
-            return { target }
+            const { scrollX, scrollY } = msg
+            return { scrollX, scrollY }
+        }
+    },
+    USER_ACTIVITY_RESIZE: {
+        renderTitle: (record) => {
+            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
+            return `Resize: ${JSON.stringify(record)}`
+        },
+        key: 'resize',
+        wrapMessage: (msg) => {
+            const { innerWidth, innerHeight } = msg
+            return { innerWidth, innerHeight }
         }
     },
 })
