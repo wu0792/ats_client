@@ -7,8 +7,7 @@ module.exports = {
         background: './src/ext/html/background.js',
         content: './src/ext/html/content.js',
         panel: './src/ext/html/panel.js',
-        devtools: './src/ext/html/devtools.js',
-        hookEventListener: './src/ext/html/hookEventListener.js',
+        devtools: './src/ext/html/devtools.js'
     },
     output: {
         path: path.join(__dirname, 'build'),
