@@ -1,4 +1,5 @@
 import * as CONSTS from './consts'
+import { UserActivityListener } from './userActivityListener';
 
 const Selector = require('css-selector-generator')
 const selector = new Selector()
@@ -6,7 +7,8 @@ const selector = new Selector()
 let tabId = 0,
     domHasLoaded = false,
     mutationObserver = null,
-    connContentAndPanel = null
+    connContentAndPanel = null,
+    userActivityListener = null
 
 const connContentAndBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_INIT_CONTENT })
 
@@ -95,6 +97,8 @@ function doListenUserResize(ev) {
 
 //watch user input, hover
 function watchUserActivity() {
+    userActivityListener = new UserActivityListener()
+
     document.addEventListener('keydown', doListenUserKeydown)
     document.addEventListener('click', doListenUserClick, true)
     window.addEventListener('scroll', doListenUserScroll)
