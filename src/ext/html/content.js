@@ -96,7 +96,7 @@ function doListenUserResize(ev) {
 //watch user input, hover
 function watchUserActivity() {
     document.addEventListener('keydown', doListenUserKeydown)
-    document.addEventListener('click', doListenUserClick)
+    document.addEventListener('click', doListenUserClick, true)
     window.addEventListener('scroll', doListenUserScroll)
     window.addEventListener('resize', doListenUserResize)
 }

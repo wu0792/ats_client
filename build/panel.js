@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -822,7 +822,8 @@ function guardReservedKeys(customName, key) {
 
 /***/ }),
 /* 9 */,
-/* 10 */
+/* 10 */,
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -833,6 +834,8 @@ __webpack_require__.r(__webpack_exports__);
 let logs = null,
     errors = null,
     records = null
+
+const tabId = chrome.devtools.inspectedWindow.tabId
 
 function createDiv(text, className) {
     let div = document.createElement('div')
@@ -859,8 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
     errors = document.getElementById('errors')
     records = document.getElementById('records')
 
-    let isRuning = false,
-        tabId = chrome.devtools.inspectedWindow.tabId
+    let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop')
@@ -948,6 +950,12 @@ document.addEventListener('DOMContentLoaded', function () {
         appendLog('停止监听...')
     })
 })
+
+chrome.tabs.executeScript(tabId, {
+    file: 'hookEventListener.js',
+    runAt: 'document_start'
+})
+
 
 /***/ })
 /******/ ]);

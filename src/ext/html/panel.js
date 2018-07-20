@@ -4,6 +4,8 @@ let logs = null,
     errors = null,
     records = null
 
+const tabId = chrome.devtools.inspectedWindow.tabId
+
 function createDiv(text, className) {
     let div = document.createElement('div')
     div.innerText = `${new Date()}:${text}`
@@ -29,8 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     errors = document.getElementById('errors')
     records = document.getElementById('records')
 
-    let isRuning = false,
-        tabId = chrome.devtools.inspectedWindow.tabId
+    let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop')
@@ -117,4 +118,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         appendLog('停止监听...')
     })
+})
+
+chrome.tabs.executeScript(tabId, {
+    file: 'hookEventListener.js',
+    runAt: 'document_start'
 })

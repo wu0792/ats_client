@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -823,7 +823,8 @@ function guardReservedKeys(customName, key) {
 /***/ }),
 /* 9 */,
 /* 10 */,
-/* 11 */
+/* 11 */,
+/* 12 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -832,7 +833,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -841,7 +842,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
@@ -1143,7 +1144,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
   })();
 
-  if ("function" !== "undefined" && __webpack_require__(12) !== null ? __webpack_require__(11) : void 0) {
+  if ("function" !== "undefined" && __webpack_require__(13) !== null ? __webpack_require__(12) : void 0) {
     !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return CssSelectorGenerator;
     }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -1157,7 +1158,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1165,7 +1166,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 
 
-const Selector = __webpack_require__(13)
+const Selector = __webpack_require__(14)
 const selector = new Selector()
 
 let tabId = 0,
@@ -1261,7 +1262,7 @@ function doListenUserResize(ev) {
 //watch user input, hover
 function watchUserActivity() {
     document.addEventListener('keydown', doListenUserKeydown)
-    document.addEventListener('click', doListenUserClick)
+    document.addEventListener('click', doListenUserClick, true)
     window.addEventListener('scroll', doListenUserScroll)
     window.addEventListener('resize', doListenUserResize)
 }

@@ -81,18 +81,27 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 10:
+/***/ 9:
 /***/ (function(module, exports) {
 
-chrome.devtools.panels.create("ATS",
-    "./icon.png",
-    "./panel.html"
-);
+// const oldAddEventListener = EventTarget.prototype.addEventListener
+// EventTarget.prototype.addEventListener = function (eventName, handler, opts) {
+//     console.log(`addEventListener.${eventName}:`)
+//     console.log(handler)
+//     console.log(this)
+//     oldAddEventListener.bind(this)(eventName, handler, opts)
+// }
+
+// window.alert = function (msg) {
+//     console.log('hey:' + msg)
+// }
+
+// alert('hi')
 
 /***/ })
 
