@@ -199,12 +199,12 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                 }
             }
 
-            theDocument.addEventListener('keydown', handler)
+            theDocument.addEventListener('keydown', handler, true)
 
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('keydown', handler)
+            theDocument.removeEventListener('keydown', handler, true)
         }
     },
     USER_ACTIVITY_CLICK: {
@@ -233,7 +233,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('click', handler)
+            theDocument.removeEventListener('click', handler, true)
         }
     },
     USER_ACTIVITY_SCROLL: {

@@ -101,12 +101,12 @@ export const ACTION_TYPES = new Enum({
                 }
             }
 
-            theDocument.addEventListener('keydown', handler)
+            theDocument.addEventListener('keydown', handler, true)
 
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('keydown', handler)
+            theDocument.removeEventListener('keydown', handler, true)
         }
     },
     USER_ACTIVITY_CLICK: {
@@ -135,7 +135,7 @@ export const ACTION_TYPES = new Enum({
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('click', handler)
+            theDocument.removeEventListener('click', handler, true)
         }
     },
     USER_ACTIVITY_SCROLL: {

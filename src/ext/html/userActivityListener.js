@@ -14,7 +14,7 @@ export class UserActivityListener {
     }
 
     stopListen(theDocument, handlers) {
-        this.userActivityEnums.forEAch((userActivityEnum, index) => {
+        this.userActivityEnums.forEach((userActivityEnum, index) => {
             userActivityEnum.value.stopListen(theDocument, handlers[index])
         })
     }
