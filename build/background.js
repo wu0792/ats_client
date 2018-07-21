@@ -1324,6 +1324,9 @@ chrome.runtime.onConnect.addListener(function (port) {
                     console.log(existed)
                 } else if (action === 'stop') {
                     console.log('background.js receive stop action from panel.')
+                } else if (action === 'save') {
+                    const existed = ensureExist(activeTabId)
+                    port.postMessage({ action: 'dump', data: existed })
                 }
             })
             break

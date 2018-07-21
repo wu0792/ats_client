@@ -1279,7 +1279,42 @@ function guardReservedKeys(customName, key) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+// EXTERNAL MODULE: ./src/ext/html/consts.js
+var consts = __webpack_require__(0);
+
+// CONCATENATED MODULE: ./src/ext/html/saveFile.js
+/**
+ * 保存文件到本地
+ */
+class SaveFile {
+    /**
+     * 保存json格式
+     * @param {待保存数据} data 
+     * @param {document对象} theDocument 
+     * @param {文件名} fileName 
+     */
+    static saveJson(data, theDocument, fileName) {
+        let saveByteArray = (function () {
+            let a = theDocument.createElement("a")
+            theDocument.body.appendChild(a)
+            a.style = "display: none"
+
+            return function (data, name) {
+                let blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+                let url = theDocument.defaultView.URL.createObjectURL(blob)
+                a.href = url
+                a.download = name
+                a.click()
+                theDocument.defaultView.URL.revokeObjectURL(url)
+            }
+        }())
+
+        saveByteArray([data], fileName)
+    }
+}
+// CONCATENATED MODULE: ./src/ext/html/panel.js
+
 
 
 let logs = null,
@@ -1316,7 +1351,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
-        btnStop = document.getElementById('btnStop')
+        btnStop = document.getElementById('btnStop'),
+        btnSave = document.getElementById('btnSave')
 
     let connectionRuntimeWatchPanel = null,
         connectionTabsWatchPanel = null,
@@ -1329,14 +1365,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = true
         btnStop.disabled = false
+        btnSave.disabled = true
         isRuning = true
 
         if (!connectionRuntimeWatchPanel) {
-            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
+            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
         }
 
         if (!connectionTabsWatchPanel) {
-            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"] })
+            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
         }
 
         connectionRuntimeWatchPanel.postMessage({ action: 'init', tabId })
@@ -1345,9 +1382,20 @@ document.addEventListener('DOMContentLoaded', function () {
         watchNetwork()
 
         connectionTabsWatchPanel.onMessage.addListener(function (request) {
-            const theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(request.action)
+            const theActionEnum = consts["a" /* ACTION_TYPES */].get(request.action)
             if (theActionEnum) {
                 appendRecord(theActionEnum, request)
+            }
+        })
+
+        connectionRuntimeWatchPanel.onMessage.addListener(function (request) {
+            const { action, data } = request
+            switch (action) {
+                case 'dump':
+                    SaveFile.saveJson(data, document, 'ats_data.json')
+                    break
+                default:
+                    break
             }
         })
     })
@@ -1366,7 +1414,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 body = content
 
                             connectionRuntimeWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
-                            appendRecord(_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK, { url, method, body, postData, date })
+                            appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, postData, date })
                         })
                     }
                 })
@@ -1391,6 +1439,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = false
         btnStop.disabled = true
+        btnSave.disabled = false
         isRuning = false
 
         stopWatchNetwork()
@@ -1400,13 +1449,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         appendLog('停止监听...')
     })
-})
 
-chrome.tabs.executeScript(tabId, {
-    file: 'hookEventListener.js',
-    runAt: 'document_start'
-})
+    btnSave.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
 
+        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'save' })
+        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'save' })
+    })
+
+
+})
 
 /***/ })
 /******/ ]);

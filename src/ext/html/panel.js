@@ -1,4 +1,5 @@
 import * as CONSTS from './consts'
+import { SaveFile } from './saveFile'
 
 let logs = null,
     errors = null,
@@ -34,7 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
-        btnStop = document.getElementById('btnStop')
+        btnStop = document.getElementById('btnStop'),
+        btnSave = document.getElementById('btnSave')
 
     let connectionRuntimeWatchPanel = null,
         connectionTabsWatchPanel = null,
@@ -47,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = true
         btnStop.disabled = false
+        btnSave.disabled = true
         isRuning = true
 
         if (!connectionRuntimeWatchPanel) {
@@ -66,6 +69,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const theActionEnum = CONSTS.ACTION_TYPES.get(request.action)
             if (theActionEnum) {
                 appendRecord(theActionEnum, request)
+            }
+        })
+
+        connectionRuntimeWatchPanel.onMessage.addListener(function (request) {
+            const { action, data } = request
+            switch (action) {
+                case 'dump':
+                    SaveFile.saveJson(data, document, 'ats_data.json')
+                    break
+                default:
+                    break
             }
         })
     })
@@ -109,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = false
         btnStop.disabled = true
+        btnSave.disabled = false
         isRuning = false
 
         stopWatchNetwork()
@@ -118,9 +133,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         appendLog('停止监听...')
     })
-})
 
-chrome.tabs.executeScript(tabId, {
-    file: 'hookEventListener.js',
-    runAt: 'document_start'
+    btnSave.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
+
+        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'save' })
+        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'save' })
+    })
+
+
 })
