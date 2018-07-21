@@ -81,11 +81,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // frameId 表示当前page中frame的ID，0表示window.top对应frame，正数表示其余subFrame
         if (isRuning && currentTabId === tabId && frameId === 0) {
             doConnectToContent(url)
+            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NAVIGATE.key, url })
+            appendRecord(CONSTS.ACTION_TYPES.NAVIGATE, { url })
         }
     })
 
     connectionToBackground.onMessage.addListener(function (request) {
-        const { action, data, date } = request
+        const { action, data } = request
         switch (action) {
             case 'start':
                 btnStart.disabled = true
@@ -104,14 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    btnStart.addEventListener('click', (ev) => {
-        if (isRuning) {
-            return
-        }
-
-        connectionToBackground.postMessage({ action: 'init', tabId })
-    })
-
     function watchNetwork() {
         if (connectionToBackground) {
             appendLog('开始网络监听')
@@ -121,12 +115,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
-                            const { request: innerRequest, startedDateTime: date } = request,
-                                { url, postData, method } = innerRequest,
+                            const { request: innerRequest } = request,
+                                { url, form, method } = innerRequest,
                                 body = content
 
-                            connectionToBackground.postMessage({ action: 'listen', url, method, body, postData, date })
-                            appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, postData, date })
+                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, method, body, form })
+                            appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
                         })
                     }
                 })
@@ -140,6 +134,14 @@ document.addEventListener('DOMContentLoaded', function () {
             stopNetworkRequestFinishedListen = true
         }
     }
+
+    btnStart.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
+
+        connectionToBackground.postMessage({ action: 'init', tabId })
+    })
 
     btnStop.addEventListener('click', (ev) => {
         if (!isRuning) {

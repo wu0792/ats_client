@@ -114,21 +114,28 @@ const COMMON_THRESHOLD = 500
 const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     NETWORK: {
         renderTitle: (record) => {
-            const { url, method, body, postData, date } = record,
-                methodFragmentStr = method === 'POST' ? `postData:${postData}, ` : ''
-
-            return `网络请求: url:${url}, method:${method}, ${methodFragmentStr}reponse: ${body}, date:${date}`
+            return `network: ${JSON.stringify(record)}`
         },
         key: 'network',
         wrapMessage: (msg) => {
-            const { url, method, body, postData, date } = msg
-            return { url, method, body, postData, date }
+            const { url, method, body, form } = msg
+            return { url, method, body, form }
+        }
+    },
+    NAVIGATE: {
+        renderTitle: (record) => {
+            const { url } = record
+
+            return `页面跳转: url:${url}`
+        },
+        key: 'navigate',
+        wrapMessage: (msg) => {
+            const { url } = msg
+            return { url }
         }
     },
     DOM_MUTATION: {
         renderTitle: (record) => {
-            const { type, target, addedNodes, attributeName, removedNodes } = record
-
             return `dom: ${JSON.stringify(record)}`
         },
         key: 'mutation',
@@ -147,9 +154,9 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                             action: ACTION_TYPES.DOM_MUTATION.key,
                             type: mutation.type,
                             target: targetSelector,
-                            addedNodes: mutation.addedNodes,
-                            attributeName: mutation.attributeName,
-                            removedNodes: mutation.removedNodes
+                            added: mutation.addedNodes,
+                            attribute: mutation.attributeName,
+                            removed: mutation.removedNodes
                         }
 
                         ports.forEach(port => port.postMessage(message))
@@ -172,47 +179,28 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
-    NAVIGATE: {
-        renderTitle: (record) => {
-            const { url } = record
-
-            return `navigate: ${JSON.stringify(record)}`
-        },
-        key: 'mutation',
-        wrapMessage: (msg) => {
-            const { url } = msg
-            return { url }
-        },
-        listen: (theDocument, ports) => {
-            return null
-        },
-        stopListen: (theDocument, handler) => {
-
-        }
-    },
     USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
-            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
-            return `KeyDown: ${JSON.stringify(record)}`
+            return `keydown: ${JSON.stringify(record)}`
         },
         key: 'keydown',
         wrapMessage: (msg) => {
-            const { target, keyCode, ctrlKey, shiftKey, altKey } = msg
-            return { target, keyCode, ctrlKey, shiftKey, altKey }
+            const { target, code, ctrl, shift, alt } = msg
+            return { target, code, ctrl, shift, alt }
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
-                const { target, keyCode, ctrlKey, shiftKey, altKey } = ev,
+                const { target, keyCode: code, ctrlKey: ctrl, shiftKey: shift, altKey: alt } = ev,
                     targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.USER_ACTIVITY_KEYDOWN.key,
                         target: targetSelector,
-                        keyCode,
-                        ctrlKey,
-                        shiftKey,
-                        altKey
+                        code,
+                        ctrl: ctrl || undefined,
+                        shift: shift || undefined,
+                        alt: alt || undefined
                     }))
                 }
             }
@@ -227,7 +215,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     },
     USER_ACTIVITY_CLICK: {
         renderTitle: (record) => {
-            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
             return `Click: ${JSON.stringify(record)}`
         },
         key: 'click',
@@ -241,7 +228,11 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                     targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
 
                 if (targetSelector) {
-                    const message = { action: ACTION_TYPES.USER_ACTIVITY_CLICK.key, target: targetSelector }
+                    const message = {
+                        action: ACTION_TYPES.USER_ACTIVITY_CLICK.key,
+                        target: targetSelector
+                    }
+
                     ports.forEach(port => port.postMessage(message))
                 }
             }
@@ -256,19 +247,23 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     },
     USER_ACTIVITY_SCROLL: {
         renderTitle: (record) => {
-            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
             return `Scroll: ${JSON.stringify(record)}`
         },
         key: 'scroll',
         wrapMessage: (msg) => {
-            const { scrollX, scrollY } = msg
-            return { scrollX, scrollY }
+            const { x, y } = msg
+            return { x, y }
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
                     lastScrollDate = new Date()
-                    const message = { action: ACTION_TYPES.USER_ACTIVITY_SCROLL.key, scrollX, scrollY }
+                    const message = {
+                        action: ACTION_TYPES.USER_ACTIVITY_SCROLL.key,
+                        x: scrollX,
+                        y: scrollY
+                    }
+
                     ports.forEach(port => port.postMessage(message))
                 }
             }
@@ -283,19 +278,23 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     },
     USER_ACTIVITY_RESIZE: {
         renderTitle: (record) => {
-            const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
             return `Resize: ${JSON.stringify(record)}`
         },
         key: 'resize',
         wrapMessage: (msg) => {
-            const { innerWidth, innerHeight } = msg
-            return { innerWidth, innerHeight }
+            const { width, height } = msg
+            return { width, height }
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 if (lastResizeDate === null || (new Date() - lastResizeDate) >= COMMON_THRESHOLD) {
                     lastResizeDate = new Date()
-                    const message = { action: ACTION_TYPES.USER_ACTIVITY_RESIZE.key, innerWidth, innerHeight }
+                    const message = {
+                        action: ACTION_TYPES.USER_ACTIVITY_RESIZE.key,
+                        width: innerWidth,
+                        height: innerHeight
+                    }
+
                     ports.forEach(port => port.postMessage(message))
                 }
             }
@@ -1325,23 +1324,15 @@ class UserActivityListener {
 
 
 
-let tabId = 0,
-    url = '',
-    domHasLoaded = false,
-    connContentAndPanel = null,
+let connContentAndPanel = null,
     userActivityListener = null
 
-const //COMMON_THRESHOLD = 500,
-    connContentAndBackground = chrome.runtime.connect({ name: consts["b" /* CONNECT_ID_INIT_CONTENT */] })
+const connContentAndBackground = chrome.runtime.connect({ name: consts["b" /* CONNECT_ID_INIT_CONTENT */] })
 
 let handlers = []
 
 //watch user input, hover
 function listen() {
-    console.log(`listen.`)
-
-    stopListen()
-
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         [consts["a" /* ACTION_TYPES */].DOM_MUTATION,
@@ -1355,7 +1346,6 @@ function listen() {
 
 //watch user input, hover
 function stopListen() {
-    console.log(`stopListen.`)
     userActivityListener && handlers.length && userActivityListener.stopListen(document, handlers)
 }
 
@@ -1364,11 +1354,9 @@ chrome.runtime.onConnect.addListener(function (port) {
         case consts["c" /* CONNECT_ID_INIT_PANEL */]:
             connContentAndPanel = port
             port.onMessage.addListener(function (msg) {
-                const { action, tabId: activeTabId, url: activeUrl } = msg
-                console.log(`tabId:${activeTabId}`)
-                if (action === 'init' && activeTabId && activeUrl) {
-                    tabId = activeTabId
-                    url = activeUrl
+                const { action, tabId, url } = msg
+                if (action === 'init' && tabId && url) {
+                    stopListen()
                     listen()
                 } else if (action === 'stop') {
                     stopListen()

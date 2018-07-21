@@ -1,4 +1,5 @@
 import * as CONSTS from './consts'
+import { getNow } from '../common';
 
 let tabs = new Map(),
     activeTabId = 0,
@@ -19,6 +20,12 @@ function ensureExist(tabId) {
     return existed
 }
 
+let seq = 0
+
+const wrapMessageWithSeq = (message) => {
+    return Object.assign(message, { id: seq++, time: getNow() })
+}
+
 chrome.runtime.onConnect.addListener(function (port) {
     switch (port.name) {
         case CONSTS.CONNECT_ID_INIT_PANEL:
@@ -28,23 +35,21 @@ chrome.runtime.onConnect.addListener(function (port) {
                 if (action === 'init' && tabId) {
                     activeTabId = tabId
                     chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
-                        port.postMessage({ action: 'start', date: new Date() })
+                        port.postMessage({ action: 'start' })
                     })
-                } else if (action === 'listen' && activeTabId) {
-                    const existed = ensureExist(activeTabId),
-                        theActionEnum = CONSTS.ACTION_TYPES.NETWORK
-
-                    existed[theActionEnum.value.key].push(theActionEnum.value.wrapMessage(msg))
-
-                    tabs.set(activeTabId, existed)
-
-                    console.log('receive network:')
-                    console.log(existed)
-                } else if (action === 'stop') {
-                    console.log('background.js receive stop action from panel.')
                 } else if (action === 'save') {
-                    const existed = ensureExist(activeTabId)
-                    port.postMessage({ action: 'dump', data: existed })
+                    port.postMessage({ action: 'dump', data: ensureExist(activeTabId) })
+                } else if (activeTabId) {
+                    const theActionEnum = CONSTS.ACTION_TYPES.get(action)
+                    if (theActionEnum) {
+                        let existed = ensureExist(activeTabId)
+
+                        existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
+                        tabs.set(activeTabId, existed)
+
+                        console.log(`receive ${theActionEnum.key}`)
+                        console.log(existed)
+                    }
                 }
             })
             break
@@ -56,7 +61,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 if (theActionEnum) {
                     let existed = ensureExist(activeTabId)
 
-                    existed[theActionEnum.value.key].push(theActionEnum.value.wrapMessage(msg))
+                    existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                     tabs.set(activeTabId, existed)
 
                     console.log(`receive ${theActionEnum.key}`)
