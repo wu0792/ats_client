@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 13);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1321,16 +1321,17 @@ function guardReservedKeys(customName, key) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
 
 /***/ }),
-/* 12 */
+/* 12 */,
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/ext/html/consts.js
+// EXTERNAL MODULE: ./src/js/consts.js
 var consts = __webpack_require__(0);
 
-// CONCATENATED MODULE: ./src/ext/html/userActivityListener.js
+// CONCATENATED MODULE: ./src/js/userActivityListener.js
 class UserActivityListener {
     constructor(ports, userActivityEnums) {
         this.ports = ports
@@ -1352,7 +1353,7 @@ class UserActivityListener {
         })
     }
 }
-// CONCATENATED MODULE: ./src/ext/html/content.js
+// CONCATENATED MODULE: ./src/js/content.js
 
 
 

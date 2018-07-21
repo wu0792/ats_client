@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1323,19 +1323,18 @@ function guardReservedKeys(customName, key) {
 /***/ }),
 /* 12 */,
 /* 13 */,
-/* 14 */,
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/ext/html/consts.js
+// EXTERNAL MODULE: ./src/js/consts.js
 var consts = __webpack_require__(0);
 
-// CONCATENATED MODULE: ./src/ext/common.js
+// CONCATENATED MODULE: ./src/common.js
 const getNow = () => +new Date() 
-// CONCATENATED MODULE: ./src/ext/html/background.js
+// CONCATENATED MODULE: ./src/js/background.js
 
 
 

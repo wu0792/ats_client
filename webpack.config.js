@@ -4,10 +4,10 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        background: './src/ext/html/background.js',
-        content: './src/ext/html/content.js',
-        panel: './src/ext/html/panel.js',
-        devtools: './src/ext/html/devtools.js'
+        background: './src/js/background.js',
+        content: './src/js/content.js',
+        panel: './src/js/panel.js',
+        devtools: './src/js/devtools.js'
     },
     output: {
         path: path.join(__dirname, 'build'),
@@ -24,10 +24,10 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            { from: './src/ext/manifest.json', to: './', force: true },
-            { from: './src/ext/html/devtools.html', to: './', force: true },
-            { from: './src/ext/html/panel.html', to: './', force: true },
-            { from: './src/ext/images/icon.png', to: './', force: true },
+            { from: './src/manifest.json', to: './', force: true },
+            { from: './src/html/devtools.html', to: './', force: true },
+            { from: './src/html/panel.html', to: './', force: true },
+            { from: './src/images/icon.png', to: './', force: true },
         ], {})
     ],
     watch: true
