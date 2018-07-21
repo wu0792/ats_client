@@ -13,10 +13,11 @@ function listen() {
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         [CONSTS.ACTION_TYPES.DOM_MUTATION,
-        CONSTS.ACTION_TYPES.USER_ACTIVITY_KEYDOWN,
-        CONSTS.ACTION_TYPES.USER_ACTIVITY_CLICK,
-        CONSTS.ACTION_TYPES.USER_ACTIVITY_SCROLL,
-        CONSTS.ACTION_TYPES.USER_ACTIVITY_RESIZE])
+        CONSTS.ACTION_TYPES.KEYDOWN,
+        CONSTS.ACTION_TYPES.MOUSE_OVER,
+        CONSTS.ACTION_TYPES.CLICK,
+        CONSTS.ACTION_TYPES.SCROLL,
+        CONSTS.ACTION_TYPES.RESIZE])
 
     handlers = userActivityListener.listen(document)
 }

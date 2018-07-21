@@ -179,7 +179,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
-    USER_ACTIVITY_KEYDOWN: {
+    KEYDOWN: {
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
@@ -195,7 +195,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
-                        action: ACTION_TYPES.USER_ACTIVITY_KEYDOWN.key,
+                        action: ACTION_TYPES.KEYDOWN.key,
                         target: targetSelector,
                         code,
                         ctrl: ctrl || undefined,
@@ -213,7 +213,39 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             theDocument.removeEventListener('keydown', handler, true)
         }
     },
-    USER_ACTIVITY_CLICK: {
+    MOUSE_OVER: {
+        renderTitle: (record) => {
+            return `mouseover: ${JSON.stringify(record)}`
+        },
+        key: 'mouseover',
+        wrapMessage: (msg) => {
+            const { target, x, y } = msg
+            return { target, x, y }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target, clientX: x, clientY: y } = ev,
+                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.MOUSE_OVER.key,
+                        target: targetSelector,
+                        x,
+                        y
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('mouseover', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('mouseover', handler, true)
+        }
+    },
+    CLICK: {
         renderTitle: (record) => {
             return `Click: ${JSON.stringify(record)}`
         },
@@ -229,7 +261,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
 
                 if (targetSelector) {
                     const message = {
-                        action: ACTION_TYPES.USER_ACTIVITY_CLICK.key,
+                        action: ACTION_TYPES.CLICK.key,
                         target: targetSelector
                     }
 
@@ -245,7 +277,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             theDocument.removeEventListener('click', handler, true)
         }
     },
-    USER_ACTIVITY_SCROLL: {
+    SCROLL: {
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -259,7 +291,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
                     lastScrollDate = new Date()
                     const message = {
-                        action: ACTION_TYPES.USER_ACTIVITY_SCROLL.key,
+                        action: ACTION_TYPES.SCROLL.key,
                         x: scrollX,
                         y: scrollY
                     }
@@ -276,7 +308,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             theDocument.removeEventListener('scroll', handler)
         }
     },
-    USER_ACTIVITY_RESIZE: {
+    RESIZE: {
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
@@ -290,7 +322,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                 if (lastResizeDate === null || (new Date() - lastResizeDate) >= COMMON_THRESHOLD) {
                     lastResizeDate = new Date()
                     const message = {
-                        action: ACTION_TYPES.USER_ACTIVITY_RESIZE.key,
+                        action: ACTION_TYPES.RESIZE.key,
                         width: innerWidth,
                         height: innerHeight
                     }
