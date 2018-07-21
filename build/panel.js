@@ -172,6 +172,24 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
+    NAVIGATE: {
+        renderTitle: (record) => {
+            const { url } = record
+
+            return `navigate: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { url } = msg
+            return { url }
+        },
+        listen: (theDocument, ports) => {
+            return null
+        },
+        stopListen: (theDocument, handler) => {
+
+        }
+    },
     USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
@@ -1321,6 +1339,10 @@ let logs = null,
     errors = null,
     records = null
 
+let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] }),
+    connectionToContent = null,
+    stopNetworkRequestFinishedListen = null
+
 const tabId = chrome.devtools.inspectedWindow.tabId
 
 function createDiv(text, className) {
@@ -1335,12 +1357,38 @@ function appendLog(log) {
     logs && logs.appendChild(createDiv(log))
 }
 
+function clearLogs() {
+    if (logs) {
+        logs.innerHTML = ''
+    }
+}
+
 function appendError(error) {
     errors && errors.appendChild(createDiv(error))
 }
 
 function appendRecord(type, record) {
-    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
+    // records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
+    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.key}]`))
+}
+
+function doConnectToContent(url) {
+    if (!connectionToContent) {
+        connectionToContent = chrome.tabs.connect(tabId, { name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
+    }
+
+    connectionToContent.postMessage({ action: 'init', tabId, url })
+    connectionToContent.onDisconnect.addListener(function () {
+        connectionToContent = null
+        doConnectToContent(url)
+    })
+
+    connectionToContent.onMessage.addListener(function (request) {
+        const theActionEnum = consts["a" /* ACTION_TYPES */].get(request.action)
+        if (theActionEnum) {
+            appendRecord(theActionEnum, request)
+        }
+    })
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -1352,56 +1400,54 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
+        btnClear = document.getElementById('btnClear'),
         btnSave = document.getElementById('btnSave')
 
-    let connectionRuntimeWatchPanel = null,
-        connectionTabsWatchPanel = null,
-        stopNetworkRequestFinishedListen = null
+    btnClear.addEventListener('click', () => records.innerHTML = '')
+
+    connectionToBackground.onDisconnect.addListener(function () {
+        connectionToBackground = null
+    })
+
+    chrome.webNavigation.onCommitted.addListener((ev) => {
+        const { tabId: currentTabId, url, frameId, timeStamp } = ev
+
+        // frameId 表示当前page中frame的ID，0表示window.top对应frame，正数表示其余subFrame
+        if (isRuning && currentTabId === tabId && frameId === 0) {
+            doConnectToContent(url)
+        }
+    })
+
+    connectionToBackground.onMessage.addListener(function (request) {
+        const { action, data, date } = request
+        switch (action) {
+            case 'start':
+                btnStart.disabled = true
+                btnStop.disabled = false
+                btnSave.disabled = true
+                isRuning = true
+
+                clearLogs()
+                watchNetwork()
+                break
+            case 'dump':
+                SaveFile.saveJson(data, document, 'ats_data.json')
+                break
+            default:
+                break
+        }
+    })
 
     btnStart.addEventListener('click', (ev) => {
         if (isRuning) {
             return
         }
 
-        btnStart.disabled = true
-        btnStop.disabled = false
-        btnSave.disabled = true
-        isRuning = true
-
-        if (!connectionRuntimeWatchPanel) {
-            connectionRuntimeWatchPanel = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
-        }
-
-        if (!connectionTabsWatchPanel) {
-            connectionTabsWatchPanel = chrome.tabs.connect(tabId, { name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
-        }
-
-        connectionRuntimeWatchPanel.postMessage({ action: 'init', tabId })
-        connectionTabsWatchPanel.postMessage({ action: 'init', tabId })
-
-        watchNetwork()
-
-        connectionTabsWatchPanel.onMessage.addListener(function (request) {
-            const theActionEnum = consts["a" /* ACTION_TYPES */].get(request.action)
-            if (theActionEnum) {
-                appendRecord(theActionEnum, request)
-            }
-        })
-
-        connectionRuntimeWatchPanel.onMessage.addListener(function (request) {
-            const { action, data } = request
-            switch (action) {
-                case 'dump':
-                    SaveFile.saveJson(data, document, 'ats_data.json')
-                    break
-                default:
-                    break
-            }
-        })
+        connectionToBackground.postMessage({ action: 'init', tabId })
     })
 
     function watchNetwork() {
-        if (connectionRuntimeWatchPanel) {
+        if (connectionToBackground) {
             appendLog('开始网络监听')
             stopNetworkRequestFinishedListen = false
             chrome.devtools.network.onRequestFinished.addListener(
@@ -1413,7 +1459,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 { url, postData, method } = innerRequest,
                                 body = content
 
-                            connectionRuntimeWatchPanel.postMessage({ action: 'listen', url, method, body, postData, date })
+                            connectionToBackground.postMessage({ action: 'listen', url, method, body, postData, date })
                             appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, postData, date })
                         })
                     }
@@ -1425,10 +1471,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function stopWatchNetwork() {
         if (!stopNetworkRequestFinishedListen) {
-            appendLog('停止网络监听')
             stopNetworkRequestFinishedListen = true
-        } else {
-            appendError('无法停止监听网络，因为当前不是监听状态')
         }
     }
 
@@ -1444,8 +1487,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         stopWatchNetwork()
 
-        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'stop' })
-        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'stop' })
+        connectionToBackground && connectionToBackground.postMessage({ action: 'stop' })
+        connectionToContent && connectionToContent.postMessage({ action: 'stop' })
 
         appendLog('停止监听...')
     })
@@ -1455,11 +1498,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return
         }
 
-        connectionRuntimeWatchPanel && connectionRuntimeWatchPanel.postMessage({ action: 'save' })
-        connectionTabsWatchPanel && connectionTabsWatchPanel.postMessage({ action: 'save' })
+        connectionToBackground && connectionToBackground.postMessage({ action: 'save' })
+        connectionToContent && connectionToContent.postMessage({ action: 'save' })
     })
-
-
 })
 
 /***/ })

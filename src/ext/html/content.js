@@ -2,6 +2,7 @@ import * as CONSTS from './consts'
 import { UserActivityListener } from './userActivityListener';
 
 let tabId = 0,
+    url = '',
     domHasLoaded = false,
     connContentAndPanel = null,
     userActivityListener = null
@@ -13,6 +14,10 @@ let handlers = []
 
 //watch user input, hover
 function listen() {
+    console.log(`listen.`)
+
+    stopListen()
+
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         [CONSTS.ACTION_TYPES.DOM_MUTATION,
@@ -26,6 +31,7 @@ function listen() {
 
 //watch user input, hover
 function stopListen() {
+    console.log(`stopListen.`)
     userActivityListener && handlers.length && userActivityListener.stopListen(document, handlers)
 }
 
@@ -34,10 +40,11 @@ chrome.runtime.onConnect.addListener(function (port) {
         case CONSTS.CONNECT_ID_INIT_PANEL:
             connContentAndPanel = port
             port.onMessage.addListener(function (msg) {
-                const { action, tabId: activeTabId } = msg
-
-                if (action === 'init' && activeTabId) {
+                const { action, tabId: activeTabId, url: activeUrl } = msg
+                console.log(`tabId:${activeTabId}`)
+                if (action === 'init' && activeTabId && activeUrl) {
                     tabId = activeTabId
+                    url = activeUrl
                     listen()
                 } else if (action === 'stop') {
                     stopListen()

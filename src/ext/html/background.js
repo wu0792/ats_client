@@ -27,6 +27,9 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                 if (action === 'init' && tabId) {
                     activeTabId = tabId
+                    chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
+                        port.postMessage({ action: 'start', date: new Date() })
+                    })
                 } else if (action === 'listen' && activeTabId) {
                     const existed = ensureExist(activeTabId),
                         theActionEnum = CONSTS.ACTION_TYPES.NETWORK
@@ -34,8 +37,6 @@ chrome.runtime.onConnect.addListener(function (port) {
                     existed[theActionEnum.value.key].push(theActionEnum.value.wrapMessage(msg))
 
                     tabs.set(activeTabId, existed)
-
-                    chrome.storage.local.set({ [`ats_${activeTabId}`]: { data: existed, update_at: new Date() } })
 
                     console.log('receive network:')
                     console.log(existed)

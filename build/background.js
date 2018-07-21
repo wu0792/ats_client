@@ -172,6 +172,24 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
+    NAVIGATE: {
+        renderTitle: (record) => {
+            const { url } = record
+
+            return `navigate: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { url } = msg
+            return { url }
+        },
+        listen: (theDocument, ports) => {
+            return null
+        },
+        stopListen: (theDocument, handler) => {
+
+        }
+    },
     USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
@@ -1310,6 +1328,9 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                 if (action === 'init' && tabId) {
                     activeTabId = tabId
+                    chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
+                        port.postMessage({ action: 'start', date: new Date() })
+                    })
                 } else if (action === 'listen' && activeTabId) {
                     const existed = ensureExist(activeTabId),
                         theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK
@@ -1317,8 +1338,6 @@ chrome.runtime.onConnect.addListener(function (port) {
                     existed[theActionEnum.value.key].push(theActionEnum.value.wrapMessage(msg))
 
                     tabs.set(activeTabId, existed)
-
-                    chrome.storage.local.set({ [`ats_${activeTabId}`]: { data: existed, update_at: new Date() } })
 
                     console.log('receive network:')
                     console.log(existed)

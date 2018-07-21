@@ -172,6 +172,24 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
+    NAVIGATE: {
+        renderTitle: (record) => {
+            const { url } = record
+
+            return `navigate: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { url } = msg
+            return { url }
+        },
+        listen: (theDocument, ports) => {
+            return null
+        },
+        stopListen: (theDocument, handler) => {
+
+        }
+    },
     USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
@@ -1308,6 +1326,7 @@ class UserActivityListener {
 
 
 let tabId = 0,
+    url = '',
     domHasLoaded = false,
     connContentAndPanel = null,
     userActivityListener = null
@@ -1319,6 +1338,10 @@ let handlers = []
 
 //watch user input, hover
 function listen() {
+    console.log(`listen.`)
+
+    stopListen()
+
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         [consts["a" /* ACTION_TYPES */].DOM_MUTATION,
@@ -1332,6 +1355,7 @@ function listen() {
 
 //watch user input, hover
 function stopListen() {
+    console.log(`stopListen.`)
     userActivityListener && handlers.length && userActivityListener.stopListen(document, handlers)
 }
 
@@ -1340,10 +1364,11 @@ chrome.runtime.onConnect.addListener(function (port) {
         case consts["c" /* CONNECT_ID_INIT_PANEL */]:
             connContentAndPanel = port
             port.onMessage.addListener(function (msg) {
-                const { action, tabId: activeTabId } = msg
-
-                if (action === 'init' && activeTabId) {
+                const { action, tabId: activeTabId, url: activeUrl } = msg
+                console.log(`tabId:${activeTabId}`)
+                if (action === 'init' && activeTabId && activeUrl) {
                     tabId = activeTabId
+                    url = activeUrl
                     listen()
                 } else if (action === 'stop') {
                     stopListen()

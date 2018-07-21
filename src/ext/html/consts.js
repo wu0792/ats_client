@@ -74,6 +74,24 @@ export const ACTION_TYPES = new Enum({
             mutationObserver.disconnect()
         }
     },
+    NAVIGATE: {
+        renderTitle: (record) => {
+            const { url } = record
+
+            return `navigate: ${JSON.stringify(record)}`
+        },
+        key: 'mutation',
+        wrapMessage: (msg) => {
+            const { url } = msg
+            return { url }
+        },
+        listen: (theDocument, ports) => {
+            return null
+        },
+        stopListen: (theDocument, handler) => {
+
+        }
+    },
     USER_ACTIVITY_KEYDOWN: {
         renderTitle: (record) => {
             const { target: targetSelector, keyCode, ctrlKey, shiftKey, altKey } = record
