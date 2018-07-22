@@ -78,9 +78,9 @@ export const ACTION_TYPES = new Enum({
             mutationObserver.disconnect()
         }
     },
-    KEYDOWN: {
+    KEYPRESS: {
         renderTitle: (record) => {
-            return `keydown: ${JSON.stringify(record)}`
+            return `keypress: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
             const { target, code, ctrl, shift, alt } = msg
@@ -88,27 +88,25 @@ export const ACTION_TYPES = new Enum({
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
-                const { target, keyCode: code, ctrlKey: ctrl, shiftKey: shift, altKey: alt } = ev,
+                const { target, code, shiftKey: shift } = ev,
                     targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
-                        action: ACTION_TYPES.KEYDOWN.key,
+                        action: ACTION_TYPES.KEYPRESS.key,
                         target: targetSelector,
                         code,
-                        ctrl: ctrl || undefined,
-                        shift: shift || undefined,
-                        alt: alt || undefined
+                        shift: shift || undefined
                     }))
                 }
             }
 
-            theDocument.addEventListener('keydown', handler, true)
+            theDocument.addEventListener('keypress', handler, true)
 
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('keydown', handler, true)
+            theDocument.removeEventListener('keypress', handler, true)
         }
     },
     MOUSEOVER: {

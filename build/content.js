@@ -176,9 +176,9 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             mutationObserver.disconnect()
         }
     },
-    KEYDOWN: {
+    KEYPRESS: {
         renderTitle: (record) => {
-            return `keydown: ${JSON.stringify(record)}`
+            return `keypress: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
             const { target, code, ctrl, shift, alt } = msg
@@ -186,27 +186,25 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
-                const { target, keyCode: code, ctrlKey: ctrl, shiftKey: shift, altKey: alt } = ev,
+                const { target, code, shiftKey: shift } = ev,
                     targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
-                        action: ACTION_TYPES.KEYDOWN.key,
+                        action: ACTION_TYPES.KEYPRESS.key,
                         target: targetSelector,
                         code,
-                        ctrl: ctrl || undefined,
-                        shift: shift || undefined,
-                        alt: alt || undefined
+                        shift: shift || undefined
                     }))
                 }
             }
 
-            theDocument.addEventListener('keydown', handler, true)
+            theDocument.addEventListener('keypress', handler, true)
 
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('keydown', handler, true)
+            theDocument.removeEventListener('keypress', handler, true)
         }
     },
     MOUSEOVER: {
@@ -1361,7 +1359,7 @@ function listen() {
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         [consts["a" /* ACTION_TYPES */].MUTATION,
-        consts["a" /* ACTION_TYPES */].KEYDOWN,
+        consts["a" /* ACTION_TYPES */].KEYPRESS,
         consts["a" /* ACTION_TYPES */].MOUSEOVER,
         consts["a" /* ACTION_TYPES */].CLICK,
         consts["a" /* ACTION_TYPES */].SCROLL,
