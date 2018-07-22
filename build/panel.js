@@ -1357,7 +1357,7 @@ class SaveFile {
             }
         }())
 
-        saveByteArray([data], fileName)
+        saveByteArray(data, fileName)
     }
 }
 // CONCATENATED MODULE: ./src/js/panel.js

@@ -24,6 +24,6 @@ export class SaveFile {
             }
         }())
 
-        saveByteArray([data], fileName)
+        saveByteArray(data, fileName)
     }
 }
