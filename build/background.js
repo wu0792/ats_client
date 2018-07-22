@@ -116,7 +116,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
-        key: 'network',
         wrapMessage: (msg) => {
             const { url, method, body, form } = msg
             return { url, method, body, form }
@@ -128,17 +127,15 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
 
             return `页面跳转: url:${url}`
         },
-        key: 'navigate',
         wrapMessage: (msg) => {
             const { url } = msg
             return { url }
         }
     },
-    DOM_MUTATION: {
+    MUTATION: {
         renderTitle: (record) => {
             return `dom: ${JSON.stringify(record)}`
         },
-        key: 'mutation',
         wrapMessage: (msg) => {
             const { type, target } = msg
             return { type, target }
@@ -151,7 +148,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
 
                     if (targetSelector) {
                         const message = {
-                            action: ACTION_TYPES.DOM_MUTATION.key,
+                            action: ACTION_TYPES.MUTATION.key,
                             type: mutation.type,
                             target: targetSelector,
                             added: mutation.addedNodes,
@@ -183,7 +180,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
-        key: 'keydown',
         wrapMessage: (msg) => {
             const { target, code, ctrl, shift, alt } = msg
             return { target, code, ctrl, shift, alt }
@@ -213,11 +209,10 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             theDocument.removeEventListener('keydown', handler, true)
         }
     },
-    MOUSE_OVER: {
+    MOUSEOVER: {
         renderTitle: (record) => {
             return `mouseover: ${JSON.stringify(record)}`
         },
-        key: 'mouseover',
         wrapMessage: (msg) => {
             const { target, x, y } = msg
             return { target, x, y }
@@ -229,7 +224,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
-                        action: ACTION_TYPES.MOUSE_OVER.key,
+                        action: ACTION_TYPES.MOUSEOVER.key,
                         target: targetSelector,
                         x,
                         y
@@ -249,7 +244,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         renderTitle: (record) => {
             return `Click: ${JSON.stringify(record)}`
         },
-        key: 'click',
         wrapMessage: (msg) => {
             const { target } = msg
             return { target }
@@ -281,7 +275,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
-        key: 'scroll',
         wrapMessage: (msg) => {
             const { x, y } = msg
             return { x, y }
@@ -312,7 +305,6 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
-        key: 'resize',
         wrapMessage: (msg) => {
             const { width, height } = msg
             return { width, height }
@@ -1340,7 +1332,7 @@ const getNow = () => +new Date()
 
 let tabs = new Map(),
     activeTabId = 0,
-    allActionKeys = consts["a" /* ACTION_TYPES */].enums.map(theEnum => theEnum.value.key)
+    allActionKeys = consts["a" /* ACTION_TYPES */].enums.map(theEnum => theEnum.key.toLowerCase())
 
 function ensureExist(tabId) {
     let existed = tabs.get(tabId)
@@ -1381,7 +1373,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                     if (theActionEnum) {
                         let existed = ensureExist(activeTabId)
 
-                        existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
+                        existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                         tabs.set(activeTabId, existed)
 
                         console.log(`receive ${theActionEnum.key}`)
@@ -1398,7 +1390,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 if (theActionEnum) {
                     let existed = ensureExist(activeTabId)
 
-                    existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
+                    existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                     tabs.set(activeTabId, existed)
 
                     console.log(`receive ${theActionEnum.key}`)

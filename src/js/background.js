@@ -3,7 +3,7 @@ import { getNow } from '../common';
 
 let tabs = new Map(),
     activeTabId = 0,
-    allActionKeys = CONSTS.ACTION_TYPES.enums.map(theEnum => theEnum.value.key)
+    allActionKeys = CONSTS.ACTION_TYPES.enums.map(theEnum => theEnum.key.toLowerCase())
 
 function ensureExist(tabId) {
     let existed = tabs.get(tabId)
@@ -44,7 +44,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                     if (theActionEnum) {
                         let existed = ensureExist(activeTabId)
 
-                        existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
+                        existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                         tabs.set(activeTabId, existed)
 
                         console.log(`receive ${theActionEnum.key}`)
@@ -61,7 +61,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 if (theActionEnum) {
                     let existed = ensureExist(activeTabId)
 
-                    existed[theActionEnum.value.key].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
+                    existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                     tabs.set(activeTabId, existed)
 
                     console.log(`receive ${theActionEnum.key}`)

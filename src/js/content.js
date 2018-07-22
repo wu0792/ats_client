@@ -12,9 +12,9 @@ let handlers = []
 function listen() {
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
-        [CONSTS.ACTION_TYPES.DOM_MUTATION,
+        [CONSTS.ACTION_TYPES.MUTATION,
         CONSTS.ACTION_TYPES.KEYDOWN,
-        CONSTS.ACTION_TYPES.MOUSE_OVER,
+        CONSTS.ACTION_TYPES.MOUSEOVER,
         CONSTS.ACTION_TYPES.CLICK,
         CONSTS.ACTION_TYPES.SCROLL,
         CONSTS.ACTION_TYPES.RESIZE])
