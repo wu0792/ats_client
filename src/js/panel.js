@@ -115,11 +115,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
-                            const { request: innerRequest } = request,
+                            const { request: innerRequest, response } = request,
                                 { url, form, method } = innerRequest,
+                                status = response.status,
+                                contentType = response.content.mimeType,
                                 body = content
 
-                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, method, body, form })
+                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, contentType, method, body, form })
                             appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
                         })
                     }

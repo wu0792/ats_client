@@ -19,8 +19,8 @@ export const ACTION_TYPES = new Enum({
             return `network: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { url, method, body, form } = msg
-            return { url, method, body, form }
+            const { url, method, body, form, status, contentType } = msg
+            return { url, method, body, form, status, contentType }
         }
     },
     NAVIGATE: {

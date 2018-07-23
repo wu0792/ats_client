@@ -117,8 +117,8 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             return `network: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { url, method, body, form } = msg
-            return { url, method, body, form }
+            const { url, method, body, form, status, contentType } = msg
+            return { url, method, body, form, status, contentType }
         }
     },
     NAVIGATE: {
@@ -1468,11 +1468,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
-                            const { request: innerRequest } = request,
+                            const { request: innerRequest, response } = request,
                                 { url, form, method } = innerRequest,
+                                status = response.status,
+                                contentType = response.content.mimeType,
                                 body = content
 
-                            connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, method, body, form })
+                            connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, contentType, method, body, form })
                             appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, form })
                         })
                     }
