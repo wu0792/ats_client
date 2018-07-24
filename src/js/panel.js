@@ -118,10 +118,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             const { request: innerRequest, response } = request,
                                 { url, form, method } = innerRequest,
                                 status = response.status,
-                                contentType = response.content.mimeType,
+                                headers = response.headers || [],
+                                headerContentType = headers.find(header => header.name === 'content-type'),
                                 body = content
 
-                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, contentType, method, body, form })
+                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, headers: [{ 'content-type': headerContentType }] })
                             appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
                         })
                     }
