@@ -117,8 +117,8 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             return `network: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { url, method, body, form, status, contentType } = msg
-            return { url, method, body, form, status, contentType }
+            const { url, method, body, form, status, header } = msg
+            return { url, method, body, form, status, header }
         }
     },
     NAVIGATE: {
@@ -1469,13 +1469,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
                             const { request: innerRequest, response } = request,
+                                toRecordHeaderTypes = ['Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
                                 { url, form, method } = innerRequest,
                                 status = response.status,
                                 headers = response.headers || [],
-                                headerContentType = headers.find(header => header.name === 'content-type'),
                                 body = content
 
-                            connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, method, body, form, headers: [{ 'content-type': headerContentType }] })
+                            let finalHeadersIsValid = false,
+                                finalHeaders = {}
+
+                            toRecordHeaderTypes.forEach(headerType => {
+                                let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
+
+                                if (matchedHeader) {
+                                    finalHeadersIsValid = true
+                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: matchedHeader.value })
+                                }
+                            })
+
+                            connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
                             appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, form })
                         })
                     }

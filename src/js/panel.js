@@ -116,13 +116,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
                             const { request: innerRequest, response } = request,
+                                toRecordHeaderTypes = ['Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
                                 { url, form, method } = innerRequest,
                                 status = response.status,
                                 headers = response.headers || [],
-                                headerContentType = headers.find(header => header.name === 'content-type'),
                                 body = content
 
-                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, headers: [{ 'content-type': headerContentType }] })
+                            let finalHeadersIsValid = false,
+                                finalHeaders = {}
+
+                            toRecordHeaderTypes.forEach(headerType => {
+                                let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
+
+                                if (matchedHeader) {
+                                    finalHeadersIsValid = true
+                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: matchedHeader.value })
+                                }
+                            })
+
+                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
                             appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
                         })
                     }
