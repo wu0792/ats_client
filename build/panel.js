@@ -1469,7 +1469,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!stopNetworkRequestFinishedListen) {
                         request.getContent(function (content) {
                             const { request: innerRequest, response } = request,
-                                toRecordHeaderTypes = ['Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
+                                toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
                                 { url, form, method } = innerRequest,
                                 status = response.status,
                                 headers = response.headers || [],
@@ -1483,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 if (matchedHeader) {
                                     finalHeadersIsValid = true
-                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: matchedHeader.value })
+                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
                                 }
                             })
 

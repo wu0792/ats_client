@@ -1361,6 +1361,8 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                 if (action === 'init' && tabId) {
                     activeTabId = tabId
+                    seq = 0
+                    tabs = new Map()
                     chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
                         port.postMessage({ action: 'start' })
                     })
