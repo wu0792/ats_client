@@ -130,9 +130,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 if (matchedHeader) {
                                     finalHeadersIsValid = true
-                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
+                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w\-]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
                                 }
                             })
+
+                            // if ((finalHeaders['Content-Type'] || '').indexOf('image/') >= 0) {
+                            //     finalHeaders['Content-Encoding'] = 'base64'
+                            // }
 
                             connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
                             appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
