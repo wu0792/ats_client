@@ -98,8 +98,7 @@
 /* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(enum__WEBPACK_IMPORTED_MODULE_0__);
 
 
-const Selector = __webpack_require__(5)
-const selector = new Selector()
+const { getSelector } = __webpack_require__(16)
 
 const CONNECT_ID_INIT_PANEL = 'CONNECT_ID_INIT_PANEL'
 const CONNECT_ID_INIT_CONTENT = 'CONNECT_ID_INIT_CONTENT'
@@ -144,7 +143,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     const target = mutation.target,
-                        targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(mutation.target) : ''
+                        targetSelector = getSelector(target, theDocument)
 
                     if (targetSelector) {
                         const message = {
@@ -187,7 +186,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, code, shiftKey: shift } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
@@ -218,7 +217,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, clientX: x, clientY: y } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
@@ -249,7 +248,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     const message = {
@@ -1467,33 +1466,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 function (request) {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
-                        request.getContent(function (content) {
-                            const { request: innerRequest, response } = request,
-                                toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
-                                { url, form, method } = innerRequest,
-                                status = response.status,
-                                headers = response.headers || [],
-                                body = content
+                        //skip the images
+                        if (request.response && request.response.content && request.response.content.mimeType && request.response.content.mimeType.match(/^image\//i)) {
+                            return
+                        } else {
+                            request.getContent(function (content) {
+                                const { request: innerRequest, response } = request,
+                                    toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
+                                    { url, form, method } = innerRequest,
+                                    status = response.status,
+                                    headers = response.headers || [],
+                                    body = content
 
-                            let finalHeadersIsValid = false,
-                                finalHeaders = {}
+                                let finalHeadersIsValid = false,
+                                    finalHeaders = {}
 
-                            toRecordHeaderTypes.forEach(headerType => {
-                                let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
+                                toRecordHeaderTypes.forEach(headerType => {
+                                    let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
 
-                                if (matchedHeader) {
-                                    finalHeadersIsValid = true
-                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w\-]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
-                                }
+                                    if (matchedHeader) {
+                                        finalHeadersIsValid = true
+                                        finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w\-]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
+                                    }
+                                })
+
+                                connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
+                                appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, form })
                             })
-
-                            // if ((finalHeaders['Content-Type'] || '').indexOf('image/') >= 0) {
-                            //     finalHeaders['Content-Encoding'] = 'base64'
-                            // }
-
-                            connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
-                            appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, form })
-                        })
+                        }
                     }
                 })
         } else {
@@ -1542,6 +1542,91 @@ document.addEventListener('DOMContentLoaded', function () {
         connectionToContent && connectionToContent.postMessage({ action: 'save' })
     })
 })
+
+/***/ }),
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Selector = __webpack_require__(5)
+const selector = new Selector()
+
+const getSelector = (target, theDocument) => {
+    let avaliableSelectors = [],
+        selector1 = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+
+    // css-selector-generator
+    selector1 && avaliableSelectors.push(selector1)
+
+    // get the selector by className and nodeName
+    const getJoinedClassName = (node) => {
+        return Array.from(node.classList).map(name => `.${name}`).join('')
+    }
+
+    const queryAllElements = (selector) => {
+        return Array.from(theDocument.querySelectorAll(selector))
+    }
+
+    const getNodeName = (node) => {
+        return node.nodeName.toLowerCase()
+    }
+
+    const checkIfUniqe = (toCheckSelector) => {
+        let list = Array.from(theDocument.querySelectorAll(toCheckSelector))
+
+        return list.length === 1 && list[0] === target
+    }
+
+    const getNthOfNodeInParent = (node) => {
+        return Array.from(node.parentElement.children).indexOf(node) + 1
+    }
+
+    let getValidSelector = (stepTarget, selectors) => {
+        const joinedSelector = selectors.join(' ')
+
+        if (checkIfUniqe(joinedSelector)) {
+            return joinedSelector
+        } else {
+            const matchedElements = queryAllElements(joinedSelector),
+                anySiblingElement = matchedElements.some(el => el !== stepTarget && el.parentElement === stepTarget.parentElement)
+
+            if (anySiblingElement) {
+                let nth = getNthOfNodeInParent(stepTarget),
+                    intensiveSelector = selectors
+
+                if (anySiblingElement) {
+                    intensiveSelector = selectors.map((selector, index) => index === 0 ? `${selector}:nth-child(${nth})` : selector)
+                }
+
+                return getValidSelector(stepTarget, intensiveSelector)
+            } else if (stepTarget.parentElement) {
+                const parentElement = stepTarget.parentElement,
+                    pNodeName = getNodeName(parentElement),
+                    pClassNames = getJoinedClassName(parentElement),
+                    selectorsWithParent = [`${pNodeName}${pClassNames}`, ...selectors]
+
+                return getValidSelector(stepTarget.parentElement, selectorsWithParent)
+            } else {
+                return null
+            }
+        }
+    }
+
+    let className = getJoinedClassName(target),
+        nodeName = getNodeName(target),
+        classNameWithNodeName = `${nodeName}${className}`,
+        selector2 = getValidSelector(target, [classNameWithNodeName])
+
+    if (selector2) {
+        avaliableSelectors.push(selector2)
+    }
+
+    return avaliableSelectors
+}
+
+module.exports = { getSelector }
 
 /***/ })
 /******/ ]);

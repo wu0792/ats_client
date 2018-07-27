@@ -114,33 +114,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 function (request) {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
-                        request.getContent(function (content) {
-                            const { request: innerRequest, response } = request,
-                                toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
-                                { url, form, method } = innerRequest,
-                                status = response.status,
-                                headers = response.headers || [],
-                                body = content
+                        //skip the images
+                        if (request.response && request.response.content && request.response.content.mimeType && request.response.content.mimeType.match(/^image\//i)) {
+                            return
+                        } else {
+                            request.getContent(function (content) {
+                                const { request: innerRequest, response } = request,
+                                    toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
+                                    { url, form, method } = innerRequest,
+                                    status = response.status,
+                                    headers = response.headers || [],
+                                    body = content
 
-                            let finalHeadersIsValid = false,
-                                finalHeaders = {}
+                                let finalHeadersIsValid = false,
+                                    finalHeaders = {}
 
-                            toRecordHeaderTypes.forEach(headerType => {
-                                let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
+                                toRecordHeaderTypes.forEach(headerType => {
+                                    let matchedHeader = headers.find(header => (header.name || '').toLowerCase() === headerType.toLocaleLowerCase())
 
-                                if (matchedHeader) {
-                                    finalHeadersIsValid = true
-                                    finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w\-]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
-                                }
+                                    if (matchedHeader) {
+                                        finalHeadersIsValid = true
+                                        finalHeaders = Object.assign({}, finalHeaders, { [headerType]: headerType === 'Content-Type' ? matchedHeader.value.replace(/\bcharset=([\w\-]+)\b/ig, 'charset=utf-8') : matchedHeader.value })
+                                    }
+                                })
+
+                                connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
+                                appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
                             })
-
-                            // if ((finalHeaders['Content-Type'] || '').indexOf('image/') >= 0) {
-                            //     finalHeaders['Content-Encoding'] = 'base64'
-                            // }
-
-                            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
-                            appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
-                        })
+                        }
                     }
                 })
         } else {

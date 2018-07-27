@@ -1,7 +1,6 @@
 import Enum from 'enum'
 
-const Selector = require('css-selector-generator')
-const selector = new Selector()
+const { getSelector } = require('./getSelector')
 
 export const CONNECT_ID_INIT_PANEL = 'CONNECT_ID_INIT_PANEL'
 export const CONNECT_ID_INIT_CONTENT = 'CONNECT_ID_INIT_CONTENT'
@@ -46,7 +45,7 @@ export const ACTION_TYPES = new Enum({
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     const target = mutation.target,
-                        targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(mutation.target) : ''
+                        targetSelector = getSelector(target, theDocument)
 
                     if (targetSelector) {
                         const message = {
@@ -89,7 +88,7 @@ export const ACTION_TYPES = new Enum({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, code, shiftKey: shift } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
@@ -120,7 +119,7 @@ export const ACTION_TYPES = new Enum({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, clientX: x, clientY: y } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
@@ -151,7 +150,7 @@ export const ACTION_TYPES = new Enum({
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target } = ev,
-                    targetSelector = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+                    targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     const message = {
