@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,7 +98,7 @@
 /* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(enum__WEBPACK_IMPORTED_MODULE_0__);
 
 
-const { getSelector } = __webpack_require__(16)
+const { getSelector } = __webpack_require__(6)
 
 const CONNECT_ID_INIT_PANEL = 'CONNECT_ID_INIT_PANEL'
 const CONNECT_ID_INIT_CONTENT = 'CONNECT_ID_INIT_CONTENT'
@@ -359,7 +359,7 @@ exports.isNumber = isNumber;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
+module.exports = __webpack_require__(12);
 
 
 /***/ }),
@@ -698,6 +698,92 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Selector = __webpack_require__(5)
+const selector = new Selector()
+
+const getSelector = (target, theDocument) => {
+    let avaliableSelectors = [],
+        selector1 = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
+
+    // css-selector-generator
+    selector1 && avaliableSelectors.push(selector1)
+
+    // get the selector by className and nodeName
+    const getJoinedClassName = (node) => {
+        return Array.from(node.classList || []).map(name => `.${name}`).join('')
+    }
+
+    const queryAllElements = (selector) => {
+        return Array.from(theDocument.querySelectorAll(selector))
+    }
+
+    const getNodeName = (node) => {
+        return node.nodeName.toLowerCase()
+    }
+
+    const checkIfUniqe = (toCheckSelector) => {
+        let list = Array.from(theDocument.querySelectorAll(toCheckSelector))
+
+        return list.length === 1 && list[0] === target
+    }
+
+    const getNthOfNodeInParent = (node) => {
+        return node.parentElement ? (Array.from(node.parentElement.children).indexOf(node) + 1) : 0
+    }
+
+    const appendNthSelector = (selector, nth) => {
+        return nth ? `${selector}:nth-child(${nth})` : ''
+    }
+
+    const getBasicSelectorForEl = (el) => {
+        const pNodeName = getNodeName(el),
+            pClassNames = getJoinedClassName(el),
+            nth = getNthOfNodeInParent(el),
+            nthSelector = appendNthSelector('', nth)
+
+        return `${pNodeName}${pClassNames}${nthSelector}`
+    }
+
+    let searchTimes = 0
+    console.log(`getSelector`)
+    let getValidSelector = (stepTarget, selectors) => {
+        if (searchTimes >= 10) {
+            return null
+        }
+
+        console.log(`getValidSelector:${searchTimes++}`)
+        const joinedSelector = selectors.join(' ')
+
+        if (checkIfUniqe(joinedSelector)) {
+            return joinedSelector
+        } else {
+            if (stepTarget.parentElement) {
+                const parentElement = stepTarget.parentElement,
+                    parentSelector = getBasicSelectorForEl(parentElement),
+                    selectorsWithParent = [parentSelector, ...selectors]
+
+                return getValidSelector(stepTarget.parentElement, selectorsWithParent)
+            } else {
+                return null
+            }
+        }
+    }
+
+    let selector2 = getValidSelector(target, [getBasicSelectorForEl(target)])
+
+    if (selector2) {
+        avaliableSelectors.push(selector2)
+    }
+
+    return avaliableSelectors
+}
+
+module.exports = { getSelector }
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports) {
 
 /*!
@@ -724,7 +810,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -741,7 +827,7 @@ var indexOf = Array.prototype.indexOf || function (find, i /*opt*/) {
 exports.indexOf = indexOf;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -851,7 +937,7 @@ var EnumItem = (function () {
 module.exports = EnumItem;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 exports.endianness = function () { return 'LE' };
@@ -906,7 +992,7 @@ exports.homedir = function () {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var g;
@@ -932,7 +1018,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -942,18 +1028,18 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var os = _interopRequire(__webpack_require__(9));
+var os = _interopRequire(__webpack_require__(10));
 
-var EnumItem = _interopRequire(__webpack_require__(8));
+var EnumItem = _interopRequire(__webpack_require__(9));
 
 var _isType = __webpack_require__(1);
 
 var isString = _isType.isString;
 var isNumber = _isType.isNumber;
 
-var indexOf = __webpack_require__(7).indexOf;
+var indexOf = __webpack_require__(8).indexOf;
 
-var isBuffer = _interopRequire(__webpack_require__(6));
+var isBuffer = _interopRequire(__webpack_require__(7));
 
 var endianness = os.endianness();
 
@@ -1307,11 +1393,11 @@ function guardReservedKeys(customName, key) {
     throw new Error("Enum key " + key + " is a reserved word!");
   }
 }
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(11)))
 
 /***/ }),
-/* 12 */,
-/* 13 */
+/* 13 */,
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1391,97 +1477,6 @@ chrome.runtime.onConnect.addListener(function (port) {
     }
 })
 
-
-/***/ }),
-/* 14 */,
-/* 15 */,
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const Selector = __webpack_require__(5)
-const selector = new Selector()
-
-const getSelector = (target, theDocument) => {
-    let avaliableSelectors = [],
-        selector1 = target && target.getRootNode() === theDocument ? selector.getSelector(target) : ''
-
-    // css-selector-generator
-    selector1 && avaliableSelectors.push(selector1)
-
-    // get the selector by className and nodeName
-    const getJoinedClassName = (node) => {
-        return Array.from(node.classList).map(name => `.${name}`).join('')
-    }
-
-    const queryAllElements = (selector) => {
-        return Array.from(theDocument.querySelectorAll(selector))
-    }
-
-    const getNodeName = (node) => {
-        return node.nodeName.toLowerCase()
-    }
-
-    const checkIfUniqe = (toCheckSelector) => {
-        let list = Array.from(theDocument.querySelectorAll(toCheckSelector))
-
-        return list.length === 1 && list[0] === target
-    }
-
-    const getNthOfNodeInParent = (node) => {
-        return Array.from(node.parentElement.children).indexOf(node) + 1
-    }
-
-    let searchTimes = 0
-    console.log(`getSelector`)
-    let getValidSelector = (stepTarget, selectors) => {
-        if (searchTimes >= 10) {
-            return null
-        }
-
-        console.log(`getValidSelector:${searchTimes++}`)
-        const joinedSelector = selectors.join(' ')
-
-        if (checkIfUniqe(joinedSelector)) {
-            return joinedSelector
-        } else {
-            const matchedElements = queryAllElements(joinedSelector),
-                anySiblingElement = matchedElements.some(el => el !== stepTarget && el.parentElement === stepTarget.parentElement)
-
-            if (anySiblingElement) {
-                let nth = getNthOfNodeInParent(stepTarget),
-                    intensiveSelector = selectors
-
-                if (anySiblingElement) {
-                    intensiveSelector = selectors.map((selector, index) => index === 0 ? `${selector}:nth-child(${nth})` : selector)
-                }
-
-                return getValidSelector(stepTarget, intensiveSelector)
-            } else if (stepTarget.parentElement) {
-                const parentElement = stepTarget.parentElement,
-                    pNodeName = getNodeName(parentElement),
-                    pClassNames = getJoinedClassName(parentElement),
-                    selectorsWithParent = [`${pNodeName}${pClassNames}`, ...selectors]
-
-                return getValidSelector(stepTarget.parentElement, selectorsWithParent)
-            } else {
-                return null
-            }
-        }
-    }
-
-    let className = getJoinedClassName(target),
-        nodeName = getNodeName(target),
-        classNameWithNodeName = `${nodeName}${className}`,
-        selector2 = getValidSelector(target, [classNameWithNodeName])
-
-    if (selector2) {
-        avaliableSelectors.push(selector2)
-    }
-
-    return avaliableSelectors
-}
-
-module.exports = { getSelector }
 
 /***/ })
 /******/ ]);

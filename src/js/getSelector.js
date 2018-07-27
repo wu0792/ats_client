@@ -10,7 +10,7 @@ const getSelector = (target, theDocument) => {
 
     // get the selector by className and nodeName
     const getJoinedClassName = (node) => {
-        return Array.from(node.classList).map(name => `.${name}`).join('')
+        return Array.from(node.classList || []).map(name => `.${name}`).join('')
     }
 
     const queryAllElements = (selector) => {
@@ -28,7 +28,20 @@ const getSelector = (target, theDocument) => {
     }
 
     const getNthOfNodeInParent = (node) => {
-        return Array.from(node.parentElement.children).indexOf(node) + 1
+        return node.parentElement ? (Array.from(node.parentElement.children).indexOf(node) + 1) : 0
+    }
+
+    const appendNthSelector = (selector, nth) => {
+        return nth ? `${selector}:nth-child(${nth})` : ''
+    }
+
+    const getBasicSelectorForEl = (el) => {
+        const pNodeName = getNodeName(el),
+            pClassNames = getJoinedClassName(el),
+            nth = getNthOfNodeInParent(el),
+            nthSelector = appendNthSelector('', nth)
+
+        return `${pNodeName}${pClassNames}${nthSelector}`
     }
 
     let searchTimes = 0
@@ -44,23 +57,10 @@ const getSelector = (target, theDocument) => {
         if (checkIfUniqe(joinedSelector)) {
             return joinedSelector
         } else {
-            const matchedElements = queryAllElements(joinedSelector),
-                anySiblingElement = matchedElements.some(el => el !== stepTarget && el.parentElement === stepTarget.parentElement)
-
-            if (anySiblingElement) {
-                let nth = getNthOfNodeInParent(stepTarget),
-                    intensiveSelector = selectors
-
-                if (anySiblingElement) {
-                    intensiveSelector = selectors.map((selector, index) => index === 0 ? `${selector}:nth-child(${nth})` : selector)
-                }
-
-                return getValidSelector(stepTarget, intensiveSelector)
-            } else if (stepTarget.parentElement) {
+            if (stepTarget.parentElement) {
                 const parentElement = stepTarget.parentElement,
-                    pNodeName = getNodeName(parentElement),
-                    pClassNames = getJoinedClassName(parentElement),
-                    selectorsWithParent = [`${pNodeName}${pClassNames}`, ...selectors]
+                    parentSelector = getBasicSelectorForEl(parentElement),
+                    selectorsWithParent = [parentSelector, ...selectors]
 
                 return getValidSelector(stepTarget.parentElement, selectorsWithParent)
             } else {
@@ -69,10 +69,7 @@ const getSelector = (target, theDocument) => {
         }
     }
 
-    let className = getJoinedClassName(target),
-        nodeName = getNodeName(target),
-        classNameWithNodeName = `${nodeName}${className}`,
-        selector2 = getValidSelector(target, [classNameWithNodeName])
+    let selector2 = getValidSelector(target, [getBasicSelectorForEl(target)])
 
     if (selector2) {
         avaliableSelectors.push(selector2)
