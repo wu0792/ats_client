@@ -1583,7 +1583,14 @@ const getSelector = (target, theDocument) => {
         return Array.from(node.parentElement.children).indexOf(node) + 1
     }
 
+    let searchTimes = 0
+    console.log(`getSelector`)
     let getValidSelector = (stepTarget, selectors) => {
+        if (searchTimes >= 10) {
+            return null
+        }
+
+        console.log(`getValidSelector:${searchTimes++}`)
         const joinedSelector = selectors.join(' ')
 
         if (checkIfUniqe(joinedSelector)) {
