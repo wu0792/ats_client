@@ -14,6 +14,7 @@ const COMMON_THRESHOLD = 500
 
 export const ACTION_TYPES = new Enum({
     NETWORK: {
+        skipInContent: true,
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
@@ -23,6 +24,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     NAVIGATE: {
+        skipInContent: true,
         renderTitle: (record) => {
             const { url } = record
 
@@ -77,35 +79,220 @@ export const ACTION_TYPES = new Enum({
             mutationObserver.disconnect()
         }
     },
-    KEYPRESS: {
+    CHANGE: {
         renderTitle: (record) => {
-            return `keypress: ${JSON.stringify(record)}`
+            return `change: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { target, code, ctrl, shift, alt } = msg
-            return { target, code, ctrl, shift, alt }
+            const { target, value } = msg
+            return { target, value }
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
-                const { target, code, shiftKey: shift } = ev,
+                const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
-                        action: ACTION_TYPES.KEYPRESS.key,
+                        action: ACTION_TYPES.CHANGE.key,
                         target: targetSelector,
-                        code,
-                        shift: shift || undefined
+                        value: target.value
                     }))
                 }
             }
 
-            theDocument.addEventListener('keypress', handler, true)
+            theDocument.addEventListener('change', handler, true)
 
             return handler
         },
         stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('keypress', handler, true)
+            theDocument.removeEventListener('change', handler, true)
+        }
+    },
+    FOCUS: {
+        renderTitle: (record) => {
+            return `focus: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target } = ev,
+                    targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.FOCUS.key,
+                        target: targetSelector
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('focus', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('focus', handler, true)
+        }
+    },
+    BLUR: {
+        renderTitle: (record) => {
+            return `blur: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target } = msg
+            return { target }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target } = ev,
+                    targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.BLUR.key,
+                        target: targetSelector
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('blur', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('blur', handler, true)
+        }
+    },
+    KEYDOWN: {
+        renderTitle: (record) => {
+            return `keydown: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target, code } = msg
+            return { target, code }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target, code, repeat } = ev
+                if (repeat) {
+                    return
+                }
+
+                const targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.KEYDOWN.key,
+                        target: targetSelector,
+                        code
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('keydown', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('keydown', handler, true)
+        }
+    },
+    KEYUP: {
+        renderTitle: (record) => {
+            return `keyup: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target, code } = msg
+            return { target, code }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target, code, repeat } = ev
+                if (repeat) {
+                    return
+                }
+
+                const targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.KEYUP.key,
+                        target: targetSelector,
+                        code
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('keyup', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('keyup', handler, true)
+        }
+    },
+    MOUSEDOWN: {
+        renderTitle: (record) => {
+            return `mousedown: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target, code } = msg
+            return { target, code }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target, button } = ev
+                const targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.MOUSEDOWN.key,
+                        target: targetSelector,
+                        button
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('mousedown', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('mousedown', handler, true)
+        }
+    },
+    MOUSEUP: {
+        renderTitle: (record) => {
+            return `mouseup: ${JSON.stringify(record)}`
+        },
+        wrapMessage: (msg) => {
+            const { target, button } = msg
+            return { target, button }
+        },
+        listen: (theDocument, ports) => {
+            const handler = (ev) => {
+                const { target, button } = ev
+                const targetSelector = getSelector(target, theDocument)
+
+                if (targetSelector) {
+                    ports.forEach(port => port.postMessage({
+                        action: ACTION_TYPES.MOUSEUP.key,
+                        target: targetSelector,
+                        button
+                    }))
+                }
+            }
+
+            theDocument.addEventListener('mouseup', handler, true)
+
+            return handler
+        },
+        stopListen: (theDocument, handler) => {
+            theDocument.removeEventListener('mouseup', handler, true)
         }
     },
     MOUSEOVER: {
