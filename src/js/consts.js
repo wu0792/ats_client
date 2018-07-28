@@ -326,37 +326,6 @@ export const ACTION_TYPES = new Enum({
             theDocument.removeEventListener('mouseover', handler, true)
         }
     },
-    CLICK: {
-        renderTitle: (record) => {
-            return `Click: ${JSON.stringify(record)}`
-        },
-        wrapMessage: (msg) => {
-            const { target } = msg
-            return { target }
-        },
-        listen: (theDocument, ports) => {
-            const handler = (ev) => {
-                const { target } = ev,
-                    targetSelector = getSelector(target, theDocument)
-
-                if (targetSelector) {
-                    const message = {
-                        action: ACTION_TYPES.CLICK.key,
-                        target: targetSelector
-                    }
-
-                    ports.forEach(port => port.postMessage(message))
-                }
-            }
-
-            theDocument.addEventListener('click', handler, true)
-
-            return handler
-        },
-        stopListen: (theDocument, handler) => {
-            theDocument.removeEventListener('click', handler, true)
-        }
-    },
     SCROLL: {
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
