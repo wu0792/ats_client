@@ -14,7 +14,7 @@ const COMMON_THRESHOLD = 500
 
 export const ACTION_TYPES = new Enum({
     NETWORK: {
-        skipInContent: true,
+        skipListenInContent: true,
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
@@ -24,7 +24,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     NAVIGATE: {
-        skipInContent: true,
+        skipListenInContent: true,
         renderTitle: (record) => {
             const { url } = record
 
@@ -36,6 +36,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MUTATION: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `dom: ${JSON.stringify(record)}`
         },
@@ -80,6 +81,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     CHANGE: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `change: ${JSON.stringify(record)}`
         },
@@ -110,6 +112,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     FOCUS: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `focus: ${JSON.stringify(record)}`
         },
@@ -139,6 +142,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     BLUR: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `blur: ${JSON.stringify(record)}`
         },
@@ -168,6 +172,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYDOWN: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
@@ -202,6 +207,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYUP: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `keyup: ${JSON.stringify(record)}`
         },
@@ -236,6 +242,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEDOWN: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mousedown: ${JSON.stringify(record)}`
         },
@@ -266,6 +273,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEUP: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mouseup: ${JSON.stringify(record)}`
         },
@@ -296,6 +304,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEOVER: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mouseover: ${JSON.stringify(record)}`
         },
@@ -327,6 +336,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     SCROLL: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -357,6 +367,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     RESIZE: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },

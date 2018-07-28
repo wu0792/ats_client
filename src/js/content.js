@@ -12,7 +12,7 @@ let handlers = []
 function listen() {
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
-        CONSTS.ACTION_TYPES.enums.filter(theEnum => !theEnum.value.skipInContent))
+        CONSTS.ACTION_TYPES.enums.filter(theEnum => !theEnum.value.skipListenInContent))
 
     handlers = userActivityListener.listen(document)
 }

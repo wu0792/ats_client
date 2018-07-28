@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             request.getContent(function (content) {
                                 const { request: innerRequest, response } = request,
                                     toRecordHeaderTypes = ['Access-Control-Allow-Credentials', 'Content-Type', 'Access-Control-Allow-Origin', 'Content-Security-Policy'],
-                                    { url, form, method } = innerRequest,
+                                    { url, postData: form, method } = innerRequest,
                                     status = response.status,
                                     headers = response.headers || [],
                                     body = content

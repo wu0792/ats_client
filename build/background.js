@@ -112,7 +112,7 @@ const COMMON_THRESHOLD = 500
 
 const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
     NETWORK: {
-        skipInContent: true,
+        skipListenInContent: true,
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
@@ -122,7 +122,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     NAVIGATE: {
-        skipInContent: true,
+        skipListenInContent: true,
         renderTitle: (record) => {
             const { url } = record
 
@@ -134,6 +134,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     MUTATION: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `dom: ${JSON.stringify(record)}`
         },
@@ -178,6 +179,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     CHANGE: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `change: ${JSON.stringify(record)}`
         },
@@ -208,6 +210,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     FOCUS: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `focus: ${JSON.stringify(record)}`
         },
@@ -237,6 +240,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     BLUR: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `blur: ${JSON.stringify(record)}`
         },
@@ -266,6 +270,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     KEYDOWN: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
@@ -300,6 +305,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     KEYUP: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `keyup: ${JSON.stringify(record)}`
         },
@@ -334,6 +340,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     MOUSEDOWN: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mousedown: ${JSON.stringify(record)}`
         },
@@ -364,6 +371,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     MOUSEUP: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mouseup: ${JSON.stringify(record)}`
         },
@@ -394,6 +402,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     MOUSEOVER: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `mouseover: ${JSON.stringify(record)}`
         },
@@ -425,6 +434,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     SCROLL: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -455,6 +465,7 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         }
     },
     RESIZE: {
+        skipListenInContent: false,
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
