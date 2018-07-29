@@ -345,12 +345,13 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             return `mousedown: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { target, code } = msg
-            return { target, code }
+            const { target, code, button } = msg
+            return { target, code, button }
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, button } = ev
+                console.warn(ev)
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
