@@ -50,8 +50,19 @@ export const ACTION_TYPES = new Enum({
                     const target = mutation.target,
                         nodeName = target.nodeName
 
-                    // skip the unnecessary record
-                    if (['HTML', 'HEAD'].indexOf(nodeName) >= 0) {
+                    let el = target,
+                        valid = true
+                    while (el !== null) {
+                        // skip the unnecessary record
+                        if (['HEAD'].indexOf(el.nodeName) >= 0) {
+                            valid = false
+                            break
+                        }
+
+                        el = el.parentElement
+                    }
+
+                    if (valid === false) {
                         return
                     }
 
