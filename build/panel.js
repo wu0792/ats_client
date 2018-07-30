@@ -146,7 +146,14 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     const target = mutation.target,
-                        targetSelector = getSelector(target, theDocument)
+                        nodeName = target.nodeName
+
+                    // skip the unnecessary record
+                    if (['HTML', 'HEAD'].indexOf(nodeName) >= 0) {
+                        return
+                    }
+
+                    const targetSelector = getSelector(target, theDocument)
 
                     if (targetSelector) {
                         const message = {
