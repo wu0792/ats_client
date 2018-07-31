@@ -919,10 +919,6 @@ const getSelector = (target, theDocument) => {
         return Array.from(node.classList || []).map(name => `.${name}`).join('')
     }
 
-    const queryAllElements = (selector) => {
-        return Array.from(theDocument.querySelectorAll(selector))
-    }
-
     const getNodeName = (node) => {
         return node.nodeName.toLowerCase()
     }

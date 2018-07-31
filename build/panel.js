@@ -919,10 +919,6 @@ const getSelector = (target, theDocument) => {
         return Array.from(node.classList || []).map(name => `.${name}`).join('')
     }
 
-    const queryAllElements = (selector) => {
-        return Array.from(theDocument.querySelectorAll(selector))
-    }
-
     const getNodeName = (node) => {
         return node.nodeName.toLowerCase()
     }
@@ -1639,7 +1635,12 @@ class SaveFile {
         saveByteArray(data, fileName)
     }
 }
+// CONCATENATED MODULE: ./src/js/system.js
+const system = {
+    version: '1.0'
+}
 // CONCATENATED MODULE: ./src/js/panel.js
+
 
 
 
@@ -1741,7 +1742,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 watchNetwork()
                 break
             case 'dump':
-                SaveFile.saveJson(data, document, 'ats_data.json')
+                const now = new Date()
+                SaveFile.saveJson({
+                    id: +now,
+                    version: system.version,
+                    create_at: now.toISOString(),
+                    data
+                }, document, `ats_data.json`)
                 break
             default:
                 break

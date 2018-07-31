@@ -1,5 +1,6 @@
 import * as CONSTS from './consts'
 import { SaveFile } from './saveFile'
+import { system } from './system';
 
 let logs = null,
     errors = null,
@@ -99,7 +100,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 watchNetwork()
                 break
             case 'dump':
-                SaveFile.saveJson(data, document, 'ats_data.json')
+                const now = new Date()
+                SaveFile.saveJson({
+                    id: +now,
+                    version: system.version,
+                    create_at: now.toISOString(),
+                    data
+                }, document, `ats_data.json`)
                 break
             default:
                 break
