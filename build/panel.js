@@ -89,13 +89,22 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+
+// EXTERNAL MODULE: ./node_modules/enum/index.js
+var node_modules_enum = __webpack_require__(2);
+var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
+
+// CONCATENATED MODULE: ./src/js/isElementVisible.js
+const isElementVisible = (elem) => {
+    return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+}
+// CONCATENATED MODULE: ./src/js/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_INIT_CONTENT; });
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
-/* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var enum__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(enum__WEBPACK_IMPORTED_MODULE_0__);
+
 
 
 const { getSelector } = __webpack_require__(6)
@@ -110,7 +119,7 @@ let lastScrollDate = null,
 
 const COMMON_THRESHOLD = 500
 
-const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
+const ACTION_TYPES = new enum_default.a({
     NETWORK: {
         skipListenInContent: true,
         renderTitle: (record) => {
@@ -145,8 +154,12 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
         listen: (theDocument, ports) => {
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
-                    const target = mutation.target,
-                        nodeName = target.nodeName
+                    let target = mutation.target
+
+                    //record #text's parentElement
+                    while (target.nodeName === '#text' && target.parentElement) {
+                        target = target.parentElement
+                    }
 
                     let el = target,
                         valid = true
@@ -161,6 +174,11 @@ const ACTION_TYPES = new enum__WEBPACK_IMPORTED_MODULE_0___default.a({
                     }
 
                     if (valid === false) {
+                        return
+                    }
+
+                    const isVisible = isElementVisible(target)
+                    if (!isVisible) {
                         return
                     }
 
@@ -1588,7 +1606,7 @@ function guardReservedKeys(customName, key) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/js/consts.js
+// EXTERNAL MODULE: ./src/js/consts.js + 1 modules
 var consts = __webpack_require__(0);
 
 // CONCATENATED MODULE: ./src/js/saveFile.js

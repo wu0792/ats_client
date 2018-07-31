@@ -1,4 +1,5 @@
 import Enum from 'enum'
+import { isElementVisible } from './isElementVisible';
 
 const { getSelector } = require('./getSelector')
 
@@ -47,8 +48,12 @@ export const ACTION_TYPES = new Enum({
         listen: (theDocument, ports) => {
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
-                    const target = mutation.target,
-                        nodeName = target.nodeName
+                    let target = mutation.target
+
+                    //record #text's parentElement
+                    while (target.nodeName === '#text' && target.parentElement) {
+                        target = target.parentElement
+                    }
 
                     let el = target,
                         valid = true
@@ -63,6 +68,11 @@ export const ACTION_TYPES = new Enum({
                     }
 
                     if (valid === false) {
+                        return
+                    }
+
+                    const isVisible = isElementVisible(target)
+                    if (!isVisible) {
                         return
                     }
 
