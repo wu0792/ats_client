@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -96,7 +96,7 @@ var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
 
 // CONCATENATED MODULE: ./src/js/isElementVisible.js
 const isElementVisible = (elem) => {
-    if (elem.offsetParent === null) {
+    if (!elem || elem.offsetParent === null) {
         return false
     } else {
         let anyOffset = !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length)
@@ -104,7 +104,7 @@ const isElementVisible = (elem) => {
             return false
         } else {
             const style = window.getComputedStyle(elem)
-            return style.display === 'none' || style.visibility === 'hidden'
+            return style.display !== 'none' && style.visibility !== 'hidden'
         }
     }
 }
@@ -1607,8 +1607,7 @@ function guardReservedKeys(customName, key) {
 
 /***/ }),
 /* 13 */,
-/* 14 */,
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
