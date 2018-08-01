@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 SaveFile.saveJson({
                     id: +now,
                     version: system.version,
-                    create_at: now.toISOString(),
+                    create_at: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
                     data
                 }, document, `ats_data.json`)
                 break

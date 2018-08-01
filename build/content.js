@@ -96,7 +96,17 @@ var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
 
 // CONCATENATED MODULE: ./src/js/isElementVisible.js
 const isElementVisible = (elem) => {
-    return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+    if (elem.offsetParent === null) {
+        return false
+    } else {
+        let anyOffset = !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length)
+        if (!anyOffset) {
+            return false
+        } else {
+            const style = window.getComputedStyle(elem)
+            return style.display === 'none' || style.visibility === 'hidden'
+        }
+    }
 }
 // CONCATENATED MODULE: ./src/js/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
