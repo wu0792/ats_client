@@ -68,9 +68,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
         btnClear = document.getElementById('btnClear'),
-        btnSave = document.getElementById('btnSave')
+        btnSave = document.getElementById('btnSave'),
+        btnMarkTarget = document.getElementById('btnMarkTarget'),
+        targetSelector = document.getElementById('targetSelector')
 
     btnClear.addEventListener('click', () => records.innerHTML = '')
+
+    btnMarkTarget.addEventListener('click', ev => {
+        let targetSelectors = targetSelector.value.trim().split('\n')
+
+        targetSelectors.forEach(selector => {
+            chrome.tabs.executeScript(tabId, {
+                code: `
+            let invalidSelectors = []
+            const theTarget = document.querySelector('${selector}')
+
+            if (theTarget) {
+                const rect = theTarget.getBoundingClientRect()
+                let div = document.createElement('div')
+                div.style.position = 'absolute'
+                div.style.border = 'dashed 1px red'
+                div.style.top = rect.top + 'px'
+                div.style.left = rect.left + 'px'
+                div.style.width = rect.width + 'px'
+                div.style.height = rect.height + 'px'
+                div.style.opacity = '.3'
+                div.style.backgroundColor = 'wheat'
+
+                document.body.appendChild(div)
+            } else {
+                invalidSelectors.push(selector)
+            }
+            
+            if(invalidSelectors.length){
+                alert('invalid selectors: ' + invalidSelectors.join(','))
+            }
+            ` }, function (result) {
+                    debugger
+                })
+        })
+    })
 
     connectionToBackground.onDisconnect.addListener(function () {
         connectionToBackground = null
