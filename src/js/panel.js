@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 div.style.height = rect.height + 'px'
                 div.style.opacity = '.3'
                 div.style.backgroundColor = 'wheat'
+                div.style.zIndex = '100000'
 
                 document.body.appendChild(div)
             } else {
