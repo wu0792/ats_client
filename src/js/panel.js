@@ -72,14 +72,24 @@ document.addEventListener('DOMContentLoaded', function () {
         btnMarkTarget = document.getElementById('btnMarkTarget'),
         targetSelector = document.getElementById('targetSelector')
 
+    const getTargetSelectors = () => {
+        const targetSelectorValue = (targetSelector.value || '').trim()
+        return targetSelectorValue.split('\n').map(val => val.trim())
+    }
+
     btnClear.addEventListener('click', () => records.innerHTML = '')
 
     btnMarkTarget.addEventListener('click', ev => {
-        let targetSelectors = targetSelector.value.trim().split('\n')
+        const targetSelectors = getTargetSelectors(),
+            markerClassName = '.__ats__target__'
+
+        chrome.tabs.executeScript(tabId, {
+            code: `Array.from(document.querySelectorAll('${markerClassName}')).forEach(el => el.remove())`
+        })
 
         targetSelectors.forEach(selector => {
             chrome.tabs.executeScript(tabId, {
-                code: `
+                code: `{
             let invalidSelectors = []
             const theTarget = document.querySelector('${selector}')
 
@@ -95,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 div.style.opacity = '.3'
                 div.style.backgroundColor = 'wheat'
                 div.style.zIndex = '100000'
+                div.className = '${markerClassName}'
 
                 document.body.appendChild(div)
             } else {
@@ -104,9 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if(invalidSelectors.length){
                 alert('invalid selectors: ' + invalidSelectors.join(','))
             }
-            ` }, function (result) {
-                    debugger
-                })
+        }` })
         })
     })
 
@@ -132,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 btnStart.disabled = true
                 btnStop.disabled = false
                 btnSave.disabled = true
+                btnMarkTarget.disabled = true
                 isRuning = true
 
                 clearLogs()
@@ -142,7 +152,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 SaveFile.saveJson({
                     id: +now,
                     version: system.version,
-                    create_at: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
+                    rootTargets: getTargetSelectors(),
+                    createAt: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
                     data
                 }, document, `ats_data.json`)
                 break
@@ -216,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btnStart.disabled = false
         btnStop.disabled = true
         btnSave.disabled = false
+        btnMarkTarget.disabled = false
         isRuning = false
 
         stopWatchNetwork()
