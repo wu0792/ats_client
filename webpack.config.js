@@ -27,7 +27,8 @@ module.exports = {
             { from: './src/manifest.json', to: './', force: true },
             { from: './src/html/devtools.html', to: './', force: true },
             { from: './src/html/panel.html', to: './', force: true },
-            { from: './src/images/icon.png', to: './', force: true },
+            { from: './src/styles/panel.css', to: './', force: true },
+            { from: './src/images/icons.png', to: './', force: true },
         ], {})
     ],
     watch: true

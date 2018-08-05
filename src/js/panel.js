@@ -1,6 +1,7 @@
 import * as CONSTS from './consts'
 import { SaveFile } from './saveFile'
-import { system } from './system';
+import { system } from './system'
+import { getNowString } from '../common'
 
 let logs = null,
     errors = null,
@@ -12,16 +13,16 @@ let connectionToBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_IN
 
 const tabId = chrome.devtools.inspectedWindow.tabId
 
-function createDiv(text, className) {
-    let div = document.createElement('div')
-    div.innerText = `${new Date()}:${text}`
-    className && div.setAttribute('class', className)
+function createEl(type, text, className) {
+    let entry = document.createElement(type)
+    entry.innerHTML = `${getNowString()}${text}`
+    className && entry.setAttribute('class', className)
 
-    return div
+    return entry
 }
 
 function appendLog(log) {
-    logs && logs.appendChild(createDiv(log))
+    logs && logs.appendChild(createEl('li', log))
 }
 
 function clearLogs() {
@@ -31,12 +32,11 @@ function clearLogs() {
 }
 
 function appendError(error) {
-    errors && errors.appendChild(createDiv(error))
+    errors && errors.appendChild(createEl('li', error))
 }
 
 function appendRecord(type, record) {
-    // records && records.appendChild(createDiv(`【${records.children.length}】: [${type.value.renderTitle(record)}]`))
-    records && records.appendChild(createDiv(`【${records.children.length}】: [${type.key}]`))
+    records && records.appendChild(createEl('li', `${type.value.renderSummary(record)}`))
 }
 
 function doConnectToContent(url) {

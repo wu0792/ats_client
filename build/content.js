@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -135,6 +135,9 @@ const ACTION_TYPES = new enum_default.a({
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
+        renderSummary: (record) => {
+            return `<span class='icon network' title='网络请求'></span><div class='entry network'>${record.url}</div>`
+        },
         wrapMessage: (msg) => {
             const { url, method, body, form, status, header } = msg
             return { url, method, body, form, status, header }
@@ -147,6 +150,9 @@ const ACTION_TYPES = new enum_default.a({
 
             return `页面跳转: url:${url}`
         },
+        renderSummary: (record) => {
+            return `<span class='icon navigate' title='页面跳转'></span><div class='entry navigate'>${record.url}</div>`
+        },
         wrapMessage: (msg) => {
             const { url } = msg
             return { url }
@@ -156,6 +162,9 @@ const ACTION_TYPES = new enum_default.a({
         skipListenInContent: false,
         renderTitle: (record) => {
             return `dom: ${JSON.stringify(record)}`
+        },
+        renderSummary: (record) => {
+            return `<span class='icon mutation' title='页面DOM元素变化'></span><div class='entry mutation'>${record.target}</div>`
         },
         wrapMessage: (msg) => {
             const { type, target } = msg
@@ -229,6 +238,9 @@ const ACTION_TYPES = new enum_default.a({
         renderTitle: (record) => {
             return `change: ${JSON.stringify(record)}`
         },
+        renderSummary: (record) => {
+            return `<span class='icon change' title='内容改变'></span><div class='entry change'>${record.target}</div>`
+        },
         wrapMessage: (msg) => {
             const { target, value } = msg
             return { target, value }
@@ -264,6 +276,9 @@ const ACTION_TYPES = new enum_default.a({
             const { target } = msg
             return { target }
         },
+        renderSummary: (record) => {
+            return `<span class='icon focus' title='得到焦点'></span><div class='entry focus'>${record.target}</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target } = ev,
@@ -294,6 +309,9 @@ const ACTION_TYPES = new enum_default.a({
             const { target } = msg
             return { target }
         },
+        renderSummary: (record) => {
+            return `<span class='icon blur' title='丢失焦点'></span><div class='entry blur'>${record.target}</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target } = ev,
@@ -323,6 +341,9 @@ const ACTION_TYPES = new enum_default.a({
         wrapMessage: (msg) => {
             const { target, code } = msg
             return { target, code }
+        },
+        renderSummary: (record) => {
+            return `<span class='icon keydown' title='键盘按下'></span><div class='entry keydown'>${record.target}</div>`
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
@@ -359,6 +380,9 @@ const ACTION_TYPES = new enum_default.a({
             const { target, code } = msg
             return { target, code }
         },
+        renderSummary: (record) => {
+            return `<span class='icon keyup' title='键盘弹起'></span><div class='entry keyup'>${record.target}</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
@@ -394,6 +418,9 @@ const ACTION_TYPES = new enum_default.a({
             const { target, code, button } = msg
             return { target, code, button }
         },
+        renderSummary: (record) => {
+            return `<span class='icon mousedown' title='鼠标键按下'></span><div class='entry mousedown'>${record.target}</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, button } = ev
@@ -426,6 +453,9 @@ const ACTION_TYPES = new enum_default.a({
             const { target, button } = msg
             return { target, button }
         },
+        renderSummary: (record) => {
+            return `<span class='icon mouseup' title='鼠标键弹起'></span><div class='entry mouseup'>${record.target}</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 const { target, button } = ev
@@ -456,6 +486,9 @@ const ACTION_TYPES = new enum_default.a({
         wrapMessage: (msg) => {
             const { target, x, y } = msg
             return { target, x, y }
+        },
+        renderSummary: (record) => {
+            return `<span class='icon mouseover' title='鼠标HOVER'></span><div class='entry mouseover'>${record.target}</div>`
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
@@ -489,6 +522,9 @@ const ACTION_TYPES = new enum_default.a({
             const { x, y } = msg
             return { x, y }
         },
+        renderSummary: (record) => {
+            return `<span class='icon scroll' title='屏幕滚动'></span><div class='entry scroll'>(x: ${record.x}, y:${record.y})</div>`
+        },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
@@ -519,6 +555,9 @@ const ACTION_TYPES = new enum_default.a({
         wrapMessage: (msg) => {
             const { width, height } = msg
             return { width, height }
+        },
+        renderSummary: (record) => {
+            return `<span class='icon resize' title='屏幕尺寸改变'></span><div class='entry resize'>(width: ${record.width}, height: ${record.height})</div>`
         },
         listen: (theDocument, ports) => {
             const handler = (ev) => {
@@ -1606,7 +1645,8 @@ function guardReservedKeys(customName, key) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(11)))
 
 /***/ }),
-/* 13 */
+/* 13 */,
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
