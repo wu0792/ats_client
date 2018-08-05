@@ -13,16 +13,21 @@ let connectionToBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_IN
 
 const tabId = chrome.devtools.inspectedWindow.tabId
 
-function createEl(type, text, className) {
+function createEntryEl(id, type, html, className) {
     let entry = document.createElement(type)
-    entry.innerHTML = `${getNowString()}${text}`
+    id && entry.setAttribute('id', id)
+    entry.innerHTML = `${getNowString()}${html}`
     className && entry.setAttribute('class', className)
 
     return entry
 }
 
+function getCheckboxHtml() {
+    return `<input type='checkbox' checked />`
+}
+
 function appendLog(log) {
-    logs && logs.appendChild(createEl('li', log))
+    logs && logs.appendChild(createEntryEl(null, 'li', log))
 }
 
 function clearLogs() {
@@ -32,11 +37,11 @@ function clearLogs() {
 }
 
 function appendError(error) {
-    errors && errors.appendChild(createEl('li', error))
+    errors && errors.appendChild(createEntryEl(null, 'li', error))
 }
 
 function appendRecord(type, record) {
-    records && records.appendChild(createEl('li', `${type.value.renderSummary(record)}`))
+    records && records.appendChild(createEntryEl(records.children.length + '', 'li', `${type.value.renderSummary(record)}`))
 }
 
 function doConnectToContent(url) {
@@ -63,11 +68,12 @@ document.addEventListener('DOMContentLoaded', function () {
     errors = document.getElementById('errors')
     records = document.getElementById('records')
 
-    let isRuning = false
+    let isRuning = false,
+        isEditing = false
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
-        btnClear = document.getElementById('btnClear'),
+        btnEdit = document.getElementById('btnEdit'),
         btnSave = document.getElementById('btnSave'),
         btnMarkTarget = document.getElementById('btnMarkTarget'),
         targetSelector = document.getElementById('targetSelector')
@@ -76,8 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetSelectorValue = (targetSelector.value || '').trim()
         return targetSelectorValue.split('\n').map(val => val.trim())
     }
-
-    btnClear.addEventListener('click', () => records.innerHTML = '')
 
     btnMarkTarget.addEventListener('click', ev => {
         const targetSelectors = getTargetSelectors(),
@@ -149,12 +153,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 break
             case 'dump':
                 const now = new Date()
+                let finalData = data
+
+                if (isEditing) {
+                    var list = records.querySelectorAll('input[type="checkbox"]')
+                }
+
                 SaveFile.saveJson({
                     id: +now,
                     version: system.version,
                     rootTargets: getTargetSelectors(),
                     createAt: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
-                    data
+                    data: Object.keys(data).reduce((prev, next) => {
+                        prev[next] = data[next].filter(entry => {
+                            return entry.id
+                        })
+
+                        return prev
+                    }, {})
                 }, document, `ats_data.json`)
                 break
             default:
@@ -216,6 +232,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return
         }
 
+        isRuning = true
+        isEditing = false
+
         connectionToBackground.postMessage({ action: 'init', tabId })
     })
 
@@ -226,9 +245,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = false
         btnStop.disabled = true
+        btnEdit.disabled = false
         btnSave.disabled = false
         btnMarkTarget.disabled = false
         isRuning = false
+        isEditing = false
 
         stopWatchNetwork()
 
@@ -236,6 +257,33 @@ document.addEventListener('DOMContentLoaded', function () {
         connectionToContent && connectionToContent.postMessage({ action: 'stop' })
 
         appendLog('停止监听...')
+    })
+
+    btnEdit.addEventListener('click', (ev) => {
+        if (isRuning) {
+            return
+        }
+
+        if (isEditing) {
+            return
+        }
+
+        isRuning = false
+        isEditing = true
+
+        let recordChildren = Array.from(records.children),
+            childrenHtml = ''
+
+        recordChildren.forEach(child => {
+            const html = child.outerHTML,
+                match = html.match(/(<[a-zA-Z\d=\s\'\"_]*?>)(.*)/)
+
+            if (match && match.length === 3) {
+                childrenHtml += `${match[1]}${getCheckboxHtml()}${match[2]}`
+            }
+        })
+
+        records.innerHTML = childrenHtml
     })
 
     btnSave.addEventListener('click', (ev) => {
