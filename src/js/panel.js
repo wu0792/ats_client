@@ -16,7 +16,7 @@ const tabId = chrome.devtools.inspectedWindow.tabId
 function createEntryEl(id, type, html, className) {
     let entry = document.createElement(type)
     id && entry.setAttribute('id', id)
-    entry.innerHTML = `${getNowString()}${html}`
+    entry.innerHTML = html
     className && entry.setAttribute('class', className)
 
     return entry
@@ -41,7 +41,7 @@ function appendError(error) {
 }
 
 function appendRecord(type, record) {
-    records && records.appendChild(createEntryEl(records.children.length + '', 'li', `${type.value.renderSummary(record)}`))
+    records && records.appendChild(createEntryEl(records.children.length + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`))
 }
 
 function doConnectToContent(url) {
@@ -68,12 +68,10 @@ document.addEventListener('DOMContentLoaded', function () {
     errors = document.getElementById('errors')
     records = document.getElementById('records')
 
-    let isRuning = false,
-        isEditing = false
+    let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
-        btnEdit = document.getElementById('btnEdit'),
         btnSave = document.getElementById('btnSave'),
         btnMarkTarget = document.getElementById('btnMarkTarget'),
         targetSelector = document.getElementById('targetSelector')
@@ -154,19 +152,17 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'dump':
                 const now = new Date()
 
-                if (isEditing) {
-                    var checkedIds = Array.from(records.querySelectorAll('#records>li>input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
-                        return +checkbox.parentElement.getAttribute('id')
+                var checkedIds = Array.from(records.querySelectorAll('#records>li>input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
+                    return +checkbox.parentElement.getAttribute('id')
+                })
+
+                data = Object.keys(data).reduce((prev, next) => {
+                    prev[next] = data[next].filter(entry => {
+                        return checkedIds.indexOf(entry.id) >= 0
                     })
 
-                    data = Object.keys(data).reduce((prev, next) => {
-                        prev[next] = data[next].filter(entry => {
-                            return checkedIds.indexOf(entry.id) >= 0
-                        })
-
-                        return prev
-                    }, {})
-                }
+                    return prev
+                }, {})
 
                 SaveFile.saveJson({
                     id: +now,
@@ -236,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         isRuning = true
-        isEditing = false
+        records.className = 'recording'
 
         connectionToBackground.postMessage({ action: 'init', tabId })
     })
@@ -248,45 +244,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnStart.disabled = false
         btnStop.disabled = true
-        btnEdit.disabled = false
         btnSave.disabled = false
         btnMarkTarget.disabled = false
         isRuning = false
-        isEditing = false
+
+        records.className = 'stop'
 
         stopWatchNetwork()
 
         connectionToBackground && connectionToBackground.postMessage({ action: 'stop' })
         connectionToContent && connectionToContent.postMessage({ action: 'stop' })
-
-        appendLog('停止监听...')
-    })
-
-    btnEdit.addEventListener('click', (ev) => {
-        if (isRuning) {
-            return
-        }
-
-        if (isEditing) {
-            return
-        }
-
-        isRuning = false
-        isEditing = true
-
-        let recordChildren = Array.from(records.children),
-            childrenHtml = ''
-
-        recordChildren.forEach(child => {
-            const html = child.outerHTML,
-                match = html.match(/(<[a-zA-Z\d=\s\'\"_]*?>)(.*)/)
-
-            if (match && match.length === 3) {
-                childrenHtml += `${match[1]}${getCheckboxHtml()}${match[2]}`
-            }
-        })
-
-        records.innerHTML = childrenHtml
     })
 
     btnSave.addEventListener('click', (ev) => {
