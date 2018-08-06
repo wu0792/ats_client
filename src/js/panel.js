@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     connectionToBackground.onMessage.addListener(function (request) {
-        const { action, data } = request
+        let { action, data } = request
         switch (action) {
             case 'start':
                 btnStart.disabled = true
@@ -153,10 +153,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 break
             case 'dump':
                 const now = new Date()
-                let finalData = data
 
                 if (isEditing) {
-                    var list = records.querySelectorAll('input[type="checkbox"]')
+                    var checkedIds = Array.from(records.querySelectorAll('#records>li>input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
+                        return +checkbox.parentElement.getAttribute('id')
+                    })
+
+                    data = Object.keys(data).reduce((prev, next) => {
+                        prev[next] = data[next].filter(entry => {
+                            return checkedIds.indexOf(entry.id) >= 0
+                        })
+
+                        return prev
+                    }, {})
                 }
 
                 SaveFile.saveJson({
@@ -164,13 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     version: system.version,
                     rootTargets: getTargetSelectors(),
                     createAt: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
-                    data: Object.keys(data).reduce((prev, next) => {
-                        prev[next] = data[next].filter(entry => {
-                            return entry.id
-                        })
-
-                        return prev
-                    }, {})
+                    data
                 }, document, `ats_data.json`)
                 break
             default:
