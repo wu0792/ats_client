@@ -7,6 +7,15 @@ li {
     list-style: none;
 }
 
+#records .item::after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
 #records.recording .summary input[type='checkbox'] {
     display: none;
 }
@@ -33,11 +42,7 @@ li {
     padding-left: 20px;
     line-height: 16px;
     padding: 5px 20px;
-}
-
-#records .expand .detail::after {
-    content: '.';
-    clear: both;
+    cursor: initial;
 }
 
 #records .expand .detail .title {

@@ -41,9 +41,11 @@ function appendError(error) {
 }
 
 function appendRecord(type, record) {
-    let recordEntry = document.createElement('div')
+    let recordEntry = document.createElement('div'),
+        id = records.children.length
+
     recordEntry.className = 'summary'
-    let recordSummary = createEntryEl(records.children.length + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
+    let recordSummary = createEntryEl(id + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
     recordEntry.appendChild(recordSummary)
 
     recordSummary.addEventListener('click', function (ev) {
@@ -56,9 +58,13 @@ function appendRecord(type, record) {
             classList.splice(expandClassIndex, 1)
             let existingDetail = theEntry.querySelector('.detail')
             if (existingDetail) {
-                theEntry.remove(existingDetail)
+                theEntry.removeChild(existingDetail)
             }
         } else {
+            let detailHtml = type.value.renderDetail(id, record),
+                parser = new DOMParser(),
+                detailEl = parser.parseFromString(detailHtml, 'text/html').body.firstChild
+            theEntry.appendChild(detailEl)
             classList.push('expand')
         }
 
@@ -114,6 +120,11 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         targetSelectors.forEach(selector => {
+            selector = selector.trim()
+            if (!selector) {
+                return
+            }
+
             chrome.tabs.executeScript(tabId, {
                 code: `{
             let invalidSelectors = []

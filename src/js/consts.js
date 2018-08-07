@@ -22,18 +22,32 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon network' title='[network]网络请求'></span><div class='entry network'>${record.url}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
                         <div class='value'>[network]网络请求</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>URL：</div>
                         <div class='value'>${record.url}</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>METHOD：</div>
                         <div class='value'>${record.method}</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>STATUS：</div>
                         <div class='value'>${record.status}</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>BODY：</div>
                         <div class='value'>${record.body}</div>
+                        </div>
                     </div>`
         },
         wrapMessage: (msg) => {
@@ -51,12 +65,20 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon navigate' title='[navigate]页面跳转'></span><div class='entry navigate'>${record.url}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
                         <div class='value'>[navigate]页面跳转</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>URL：</div>
                         <div class='value'>${record.url}</div>
+                        </div>
                     </div>`
         },
         wrapMessage: (msg) => {
@@ -72,14 +94,24 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon mutation' title='[mutation]页面DOM元素变化'></span><div class='entry mutation'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
                         <div class='value'>[mutation]页面DOM元素变化</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TYPE：</div>
                         <div class='value'>${record.type}</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
+                        </div>
                     </div>`
         },
         wrapMessage: (msg) => {
@@ -157,14 +189,24 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon change' title='[change]内容改变'></span><div class='entry change'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[change]文本框/下拉框内容改变</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>VALUE：</div>
                         <div class='value'>${record.value}</div>
+                        </div>
                     </div>`
         },
         wrapMessage: (msg) => {
@@ -203,16 +245,22 @@ export const ACTION_TYPES = new Enum({
             return { target }
         },
         renderSummary: (record) => {
-            return `<span class='icon focus' title='[focus]得到焦点'></span><div class='entry focus'>${record.target}</div>`
+            return `<span class='icon focus' title='[focus]元素得到焦点'></span><div class='entry focus'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[focus]元素得到焦点</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -246,16 +294,22 @@ export const ACTION_TYPES = new Enum({
             return { target }
         },
         renderSummary: (record) => {
-            return `<span class='icon blur' title='[blur]丢失焦点'></span><div class='entry blur'>${record.target}</div>`
+            return `<span class='icon blur' title='[blur]元素丢失焦点'></span><div class='entry blur'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[blur]元素丢失焦点</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -291,14 +345,24 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon keydown' title='[keydown]键盘按下'></span><div class='entry keydown'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[keydown]键盘按下</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>CODE：</div>
+                        <div class='value'>${record.code}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -339,14 +403,24 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon keyup' title='[keyup]键盘弹起'></span><div class='entry keyup'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[keyup]键盘弹起</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>CODE：</div>
+                        <div class='value'>${record.code}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -381,20 +455,30 @@ export const ACTION_TYPES = new Enum({
             return `mousedown: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { target, code, button } = msg
-            return { target, code, button }
+            const { target, button } = msg
+            return { target, button }
         },
         renderSummary: (record) => {
             return `<span class='icon mousedown' title='[mousedown]鼠标键按下'></span><div class='entry mousedown'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[mousedown]鼠标键按下</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>BUTTON：</div>
+                        <div class='value'>${record.button === 0 ? '左键' : (record.button === 1 ? '右键' : '滚轮键')}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -432,14 +516,24 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon mouseup' title='[mouseup]鼠标键弹起'></span><div class='entry mouseup'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[mouseup]鼠标键弹起</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>BUTTON：</div>
+                        <div class='value'>${record.button === 0 ? '左键' : (record.button === 1 ? '右键' : '滚轮键')}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -476,14 +570,20 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon mouseover' title='[mouseover]鼠标HOVER'></span><div class='entry mouseover'>${record.target}</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[mouseover]鼠标HOVER</div>
+                        </div>
+                        <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -521,14 +621,20 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon scroll' title='[scroll]屏幕滚动'></span><div class='entry scroll'>(x: ${record.x}, y:${record.y})</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
-                        <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[scroll]屏幕滚动</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>(X, Y)：</div>
+                        <div class='value'>(${record.x}, ${record.y})</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -565,14 +671,20 @@ export const ACTION_TYPES = new Enum({
         renderSummary: (record) => {
             return `<span class='icon resize' title='[resize]屏幕尺寸改变'></span><div class='entry resize'>(width: ${record.width}, height: ${record.height})</div>`
         },
-        renderDetail: (record) => {
+        renderDetail: (id, record) => {
             return `<div class='detail'>
-                        <div class='title'>类型：</div>
-                        <div class='value'>[change]内容改变</div>
-                        <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
-                        <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        <div class='item'>
+                        <div class='title'>ID：</div>
+                        <div class='value'>${id}</div>     
+                        </div>
+                        <div class='item'>
+                        <div class='title'>TYPE：</div>
+                        <div class='value'>[resize]屏幕尺寸改变</div>
+                        </div>
+                        <div class='item'>
+                        <div class='title'>SIZE：</div>
+                        <div class='value'>(${record.width}, ${record.height})</div>
+                        </div>
                     </div>`
         },
         listen: (theDocument, ports) => {
