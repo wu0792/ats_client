@@ -41,7 +41,31 @@ function appendError(error) {
 }
 
 function appendRecord(type, record) {
-    records && records.appendChild(createEntryEl(records.children.length + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`))
+    let recordEntry = document.createElement('div')
+    recordEntry.className = 'summary'
+    let recordSummary = createEntryEl(records.children.length + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
+    recordEntry.appendChild(recordSummary)
+
+    recordSummary.addEventListener('click', function (ev) {
+        const theEntry = ev.currentTarget.parentElement,
+            classList = Array.from(theEntry.classList),
+            expandClassIndex = classList.indexOf('expand'),
+            isExpand = expandClassIndex >= 0
+
+        if (isExpand) {
+            classList.splice(expandClassIndex, 1)
+            let existingDetail = theEntry.querySelector('.detail')
+            if (existingDetail) {
+                theEntry.remove(existingDetail)
+            }
+        } else {
+            classList.push('expand')
+        }
+
+        theEntry.className = classList.join(' ')
+    })
+
+    records && records.appendChild(recordEntry)
 }
 
 function doConnectToContent(url) {

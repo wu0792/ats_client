@@ -7,45 +7,45 @@ li {
     list-style: none;
 }
 
-#records.recording>li>input[type='checkbox'] {
+#records.recording .summary input[type='checkbox'] {
     display: none;
 }
 
-#records.stop>li>input[type='checkbox'] {
+#records.stop .summary input[type='checkbox'] {
     display: inline-block;
 }
 
-#records>li{
-    
+#records .summary {
+    cursor: pointer;
 }
 
-#records>li:hover {
+#records .summary:hover {
     background-color: wheat;
 }
 
-#records>li.expand {
+#records .expand {
     background-color: #f2f2f2;
     border-bottom: solid 1px #b0e0e6;
     border-top: solid 1px #b0e0e6;
 }
 
-#records>li.expand>.detail {
+#records .expand .detail {
     padding-left: 20px;
     line-height: 16px;
     padding: 5px 20px;
 }
 
-#records>li.expand>.detail::after {
+#records .expand .detail::after {
     content: '.';
     clear: both;
 }
 
-#records>li.expand>.detail>.title {
+#records .expand .detail .title {
     float: left;
     width: 60px;
 }
 
-#records>li.expand>.detail>.value {
+#records .expand .detail .value {
     float: left;
     margin-left: 10px;
 }
