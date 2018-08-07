@@ -24,11 +24,11 @@ li {
     display: inline-block;
 }
 
-#records .summary {
+#records.stop .summary {
     cursor: pointer;
 }
 
-#records .summary:hover {
+#records .summary li[id]:hover {
     background-color: wheat;
 }
 

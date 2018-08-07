@@ -3,7 +3,8 @@ import { SaveFile } from './saveFile'
 import { system } from './system'
 import { getNowString } from '../common'
 
-let logs = null,
+let isRuning = false,
+    logs = null,
     errors = null,
     records = null
 
@@ -49,6 +50,10 @@ function appendRecord(type, record) {
     recordEntry.appendChild(recordSummary)
 
     recordSummary.addEventListener('click', function (ev) {
+        if (isRuning) {
+            return
+        }
+
         const theEntry = ev.currentTarget.parentElement,
             classList = Array.from(theEntry.classList),
             expandClassIndex = classList.indexOf('expand'),
@@ -97,8 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
     logs = document.getElementById('logs')
     errors = document.getElementById('errors')
     records = document.getElementById('records')
-
-    let isRuning = false
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
@@ -245,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 })
 
                                 connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
-                                appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form })
+                                appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form, status })
                             })
                         }
                     }

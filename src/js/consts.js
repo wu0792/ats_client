@@ -46,7 +46,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>BODY：</div>
-                        <div class='value'>${record.body}</div>
+                        <div class='value'>
+                            <textarea>${record.body}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -110,7 +112,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -201,11 +205,15 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                         <div class='item'>
                         <div class='title'>VALUE：</div>
-                        <div class='value'>${record.value}</div>
+                        <div class='value'>
+                            <textarea>${record.value}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -259,7 +267,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -308,7 +318,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -357,11 +369,15 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                         <div class='item'>
                         <div class='title'>CODE：</div>
-                        <div class='value'>${record.code}</div>
+                        <div class='value'>
+                            <textarea>${record.code}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -415,11 +431,15 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                         <div class='item'>
                         <div class='title'>CODE：</div>
-                        <div class='value'>${record.code}</div>
+                        <div class='value'>
+                            <textarea>${record.code}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -473,11 +493,15 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                         <div class='item'>
                         <div class='title'>BUTTON：</div>
-                        <div class='value'>${record.button === 0 ? '左键' : (record.button === 1 ? '右键' : '滚轮键')}</div>
+                        <div class='value'>
+                            <textarea>${record.button}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -528,11 +552,15 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                         <div class='item'>
                         <div class='title'>BUTTON：</div>
-                        <div class='value'>${record.button === 0 ? '左键' : (record.button === 1 ? '右键' : '滚轮键')}</div>
+                        <div class='value'>
+                        <textarea>${record.button}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -582,7 +610,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>TARGET：</div>
-                        <div class='value'>${record.target}</div>
+                        <div class='value'>
+                            <textarea>${record.target.join('|')}</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -633,7 +663,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>(X, Y)：</div>
-                        <div class='value'>(${record.x}, ${record.y})</div>
+                        <div class='value'>
+                            <textarea>(${record.x},${record.y})</textarea>
+                        </div>
                         </div>
                     </div>`
         },
@@ -683,7 +715,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                         <div class='item'>
                         <div class='title'>SIZE：</div>
-                        <div class='value'>(${record.width}, ${record.height})</div>
+                        <div class='value'>
+                            <textarea>(${record.width}, ${record.height})</textarea>
+                        </div>
                         </div>
                     </div>`
         },
