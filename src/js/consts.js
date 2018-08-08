@@ -118,6 +118,9 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
+        onDetailChanged: (id, ev) => {
+            
+        },
         wrapMessage: (msg) => {
             const { type, target } = msg
             return { type, target }

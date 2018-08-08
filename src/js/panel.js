@@ -47,6 +47,7 @@ function appendRecord(type, record) {
 
     recordEntry.className = 'summary'
     recordEntry.setAttribute('record_type', type)
+    recordEntry.setAttribute('id', id)
     let recordSummary = createEntryEl(id + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
     recordEntry.appendChild(recordSummary)
 
@@ -72,7 +73,32 @@ function appendRecord(type, record) {
                 detailEl = parser.parseFromString(detailHtml, 'text/html').body.firstChild
 
             detailEl.addEventListener('change', (ev) => {
+                let getParentUntilRecordEntry = (el) => {
+                    const parentEl = el.parentElement
+                    if (parentEl) {
+                        let theRecordType = parentEl.getAttribute('record_type')
+                        if (theRecordType) {
+                            return parentEl
+                        } else {
+                            return getParentUntilRecordEntry(parentEl)
+                        }
+                    } else {
+                        return null
+                    }
+                }
 
+                let recordTypeEl = getParentUntilRecordEntry(ev.target)
+                if (recordTypeEl) {
+                    let recordType = recordTypeEl.getAttribute('record_type'),
+                        id = recordTypeEl.id
+
+                    let recordTypeEnum = CONSTS.ACTION_TYPES.get(recordType),
+                        toRecordChangeEntry = recordTypeEnum.value.onDetailChanged(id, ev)
+
+                    //todo
+                } else {
+                    console.warn('not fuound parent element has record_type attribute.')
+                }
             }, true)
 
             theEntry.appendChild(detailEl)
