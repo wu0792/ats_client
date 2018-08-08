@@ -46,6 +46,7 @@ function appendRecord(type, record) {
         id = records.children.length
 
     recordEntry.className = 'summary'
+    recordEntry.setAttribute('record_type', type)
     let recordSummary = createEntryEl(id + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
     recordEntry.appendChild(recordSummary)
 
@@ -69,6 +70,11 @@ function appendRecord(type, record) {
             let detailHtml = type.value.renderDetail(id, record),
                 parser = new DOMParser(),
                 detailEl = parser.parseFromString(detailHtml, 'text/html').body.firstChild
+
+            detailEl.addEventListener('change', (ev) => {
+
+            }, true)
+
             theEntry.appendChild(detailEl)
             classList.push('expand')
         }
