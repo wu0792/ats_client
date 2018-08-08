@@ -234,6 +234,12 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
+        onDetailChanged: (id, ev) => {
+            return {
+                id,
+                target: ev.target.value.split('|')
+            }
+        },
         wrapMessage: (msg) => {
             const { type, target } = msg
             return { type, target }
@@ -1995,9 +2001,9 @@ var common = __webpack_require__(13);
 
 
 let isRuning = false,
-    logs = null,
-    errors = null,
-    records = null
+    hasRegWatchNetwork = false,
+    records = null,
+    changedMap = {}
 
 let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] }),
     connectionToContent = null,
@@ -2018,26 +2024,13 @@ function getCheckboxHtml() {
     return `<input type='checkbox' checked />`
 }
 
-function appendLog(log) {
-    logs && logs.appendChild(createEntryEl(null, 'li', log))
-}
-
-function clearLogs() {
-    if (logs) {
-        logs.innerHTML = ''
-    }
-}
-
-function appendError(error) {
-    errors && errors.appendChild(createEntryEl(null, 'li', error))
-}
-
 function appendRecord(type, record) {
     let recordEntry = document.createElement('div'),
         id = records.children.length
 
     recordEntry.className = 'summary'
     recordEntry.setAttribute('record_type', type)
+    recordEntry.setAttribute('id', id)
     let recordSummary = createEntryEl(id + '', 'li', `${getCheckboxHtml()}${Object(common["b" /* getNowString */])()}${type.value.renderSummary(record)}`)
     recordEntry.appendChild(recordSummary)
 
@@ -2063,7 +2056,37 @@ function appendRecord(type, record) {
                 detailEl = parser.parseFromString(detailHtml, 'text/html').body.firstChild
 
             detailEl.addEventListener('change', (ev) => {
+                let getParentUntilRecordEntry = (el) => {
+                    const parentEl = el.parentElement
+                    if (parentEl) {
+                        let theRecordType = parentEl.getAttribute('record_type')
+                        if (theRecordType) {
+                            return parentEl
+                        } else {
+                            return getParentUntilRecordEntry(parentEl)
+                        }
+                    } else {
+                        return null
+                    }
+                }
 
+                let recordTypeEl = getParentUntilRecordEntry(ev.target)
+                if (recordTypeEl) {
+                    let recordType = recordTypeEl.getAttribute('record_type'),
+                        id = recordTypeEl.id
+
+                    let recordTypeEnum = consts["a" /* ACTION_TYPES */].get(recordType),
+                        onDetailChanged = recordTypeEnum.value.onDetailChanged
+
+                    if (onDetailChanged) {
+                        let toRecordChangeEntry = onDetailChanged(id, ev)
+                        if (toRecordChangeEntry && toRecordChangeEntry.id) {
+                            changedMap[toRecordChangeEntry.id] = toRecordChangeEntry
+                        }
+                    }
+                } else {
+                    console.warn('not fuound parent element has record_type attribute.')
+                }
             }, true)
 
             theEntry.appendChild(detailEl)
@@ -2096,8 +2119,6 @@ function doConnectToContent(url) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    logs = document.getElementById('logs')
-    errors = document.getElementById('errors')
     records = document.getElementById('records')
 
     const btnStart = document.getElementById('btnStart'),
@@ -2181,16 +2202,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 btnMarkTarget.disabled = true
                 isRuning = true
 
-                clearLogs()
                 watchNetwork()
                 break
             case 'dump':
                 const now = new Date()
 
-                var checkedIds = Array.from(records.querySelectorAll('#records>li>input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
+                var checkedIds = Array.from(records.querySelectorAll('#records .summary input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
                     return +checkbox.parentElement.getAttribute('id')
                 })
 
+                //choose checked items to export
                 data = Object.keys(data).reduce((prev, next) => {
                     prev[next] = data[next].filter(entry => {
                         return checkedIds.indexOf(entry.id) >= 0
@@ -2198,6 +2219,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     return prev
                 }, {})
+
+                //modify the user changed entries
+                Object.keys(data).forEach(actionType => {
+                    data[actionType].forEach(entry => {
+                        const id = entry.id
+                        if (changedMap[id]) {
+                            Object.assign(entry, changedMap[id])
+                        }
+                    })
+                })
 
                 SaveFile.saveJson({
                     id: +now,
@@ -2214,9 +2245,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function watchNetwork() {
         if (connectionToBackground) {
-            appendLog('开始网络监听')
             stopNetworkRequestFinishedListen = false
-            chrome.devtools.network.onRequestFinished.addListener(
+            !hasRegWatchNetwork && chrome.devtools.network.onRequestFinished.addListener(
                 function (request) {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
@@ -2250,8 +2280,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 })
-        } else {
-            appendError('connectionWatchPanel为空，不能启动监听网络，可能尚未启动初始化')
+
+            hasRegWatchNetwork = true
         }
     }
 
@@ -2268,6 +2298,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         isRuning = true
         records.className = 'recording'
+        records.innerHTML = ''
+        changedMap = {}
 
         connectionToBackground.postMessage({ action: 'init', tabId })
     })

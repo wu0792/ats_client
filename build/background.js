@@ -234,6 +234,12 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
+        onDetailChanged: (id, ev) => {
+            return {
+                id,
+                target: ev.target.value.split('|')
+            }
+        },
         wrapMessage: (msg) => {
             const { type, target } = msg
             return { type, target }

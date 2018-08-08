@@ -4,9 +4,9 @@ import { system } from './system'
 import { getNowString } from '../common'
 
 let isRuning = false,
-    logs = null,
-    errors = null,
-    records = null
+    hasRegWatchNetwork = false,
+    records = null,
+    changedMap = {}
 
 let connectionToBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_INIT_PANEL }),
     connectionToContent = null,
@@ -25,20 +25,6 @@ function createEntryEl(id, type, html, className) {
 
 function getCheckboxHtml() {
     return `<input type='checkbox' checked />`
-}
-
-function appendLog(log) {
-    logs && logs.appendChild(createEntryEl(null, 'li', log))
-}
-
-function clearLogs() {
-    if (logs) {
-        logs.innerHTML = ''
-    }
-}
-
-function appendError(error) {
-    errors && errors.appendChild(createEntryEl(null, 'li', error))
 }
 
 function appendRecord(type, record) {
@@ -93,9 +79,14 @@ function appendRecord(type, record) {
                         id = recordTypeEl.id
 
                     let recordTypeEnum = CONSTS.ACTION_TYPES.get(recordType),
-                        toRecordChangeEntry = recordTypeEnum.value.onDetailChanged(id, ev)
+                        onDetailChanged = recordTypeEnum.value.onDetailChanged
 
-                    //todo
+                    if (onDetailChanged) {
+                        let toRecordChangeEntry = onDetailChanged(id, ev)
+                        if (toRecordChangeEntry && toRecordChangeEntry.id) {
+                            changedMap[toRecordChangeEntry.id] = toRecordChangeEntry
+                        }
+                    }
                 } else {
                     console.warn('not fuound parent element has record_type attribute.')
                 }
@@ -131,8 +122,6 @@ function doConnectToContent(url) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    logs = document.getElementById('logs')
-    errors = document.getElementById('errors')
     records = document.getElementById('records')
 
     const btnStart = document.getElementById('btnStart'),
@@ -216,16 +205,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 btnMarkTarget.disabled = true
                 isRuning = true
 
-                clearLogs()
                 watchNetwork()
                 break
             case 'dump':
                 const now = new Date()
 
-                var checkedIds = Array.from(records.querySelectorAll('#records>li>input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
+                var checkedIds = Array.from(records.querySelectorAll('#records .summary input[type="checkbox"]')).filter(checkbox => checkbox.checked).map(checkbox => {
                     return +checkbox.parentElement.getAttribute('id')
                 })
 
+                //choose checked items to export
                 data = Object.keys(data).reduce((prev, next) => {
                     prev[next] = data[next].filter(entry => {
                         return checkedIds.indexOf(entry.id) >= 0
@@ -233,6 +222,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     return prev
                 }, {})
+
+                //modify the user changed entries
+                Object.keys(data).forEach(actionType => {
+                    data[actionType].forEach(entry => {
+                        const id = entry.id
+                        if (changedMap[id]) {
+                            Object.assign(entry, changedMap[id])
+                        }
+                    })
+                })
 
                 SaveFile.saveJson({
                     id: +now,
@@ -249,9 +248,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function watchNetwork() {
         if (connectionToBackground) {
-            appendLog('开始网络监听')
             stopNetworkRequestFinishedListen = false
-            chrome.devtools.network.onRequestFinished.addListener(
+            !hasRegWatchNetwork && chrome.devtools.network.onRequestFinished.addListener(
                 function (request) {
                     //启用状态才需要继续
                     if (!stopNetworkRequestFinishedListen) {
@@ -285,8 +283,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 })
-        } else {
-            appendError('connectionWatchPanel为空，不能启动监听网络，可能尚未启动初始化')
+
+            hasRegWatchNetwork = true
         }
     }
 
@@ -303,6 +301,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         isRuning = true
         records.className = 'recording'
+        records.innerHTML = ''
+        changedMap = {}
 
         connectionToBackground.postMessage({ action: 'init', tabId })
     })
