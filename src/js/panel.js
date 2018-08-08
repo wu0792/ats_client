@@ -2,6 +2,7 @@ import * as CONSTS from './consts'
 import { SaveFile } from './saveFile'
 import { system } from './system'
 import { getNowString } from '../common'
+import { EntryFormater } from './entryFormater';
 
 let isRuning = false,
     hasRegWatchNetwork = false,
@@ -75,6 +76,13 @@ function appendRecord(type, record) {
 
                 let recordTypeEl = getParentUntilRecordEntry(ev.target)
                 if (recordTypeEl) {
+                    const target = ev.target,
+                        field = ev.target.getAttribute('entry_field'),
+                        // rawValue = 
+                        fieldFormatFunc = ev.target.getAttribute('entry_format')
+
+                    // finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc] :
+
                     let recordType = recordTypeEl.getAttribute('record_type'),
                         id = recordTypeEl.id
 

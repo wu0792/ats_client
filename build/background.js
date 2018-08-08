@@ -328,16 +328,27 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
                         <div class='title'>VALUE：</div>
                         <div class='value'>
-                            <textarea>${record.value}</textarea>
+                            <textarea entry_field='value'>${record.value}</textarea>
                         </div>
                         </div>
                     </div>`
+        },
+        onDetailChanged: (id, ev) => {
+            const target = ev.target,
+                field = target.getAttribute('entry_field'),
+                value = target.value.trim(),
+                finalValue = ''
+
+            return {
+                id,
+                [target]: ev.target.value.split('|')
+            }
         },
         wrapMessage: (msg) => {
             const { target, value } = msg

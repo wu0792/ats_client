@@ -328,16 +328,27 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
                         <div class='title'>VALUE：</div>
                         <div class='value'>
-                            <textarea>${record.value}</textarea>
+                            <textarea entry_field='value'>${record.value}</textarea>
                         </div>
                         </div>
                     </div>`
+        },
+        onDetailChanged: (id, ev) => {
+            const target = ev.target,
+                field = target.getAttribute('entry_field'),
+                value = target.value.trim(),
+                finalValue = ''
+
+            return {
+                id,
+                [target]: ev.target.value.split('|')
+            }
         },
         wrapMessage: (msg) => {
             const { target, value } = msg
@@ -1994,7 +2005,18 @@ const system = {
 // EXTERNAL MODULE: ./src/common.js
 var common = __webpack_require__(13);
 
+// CONCATENATED MODULE: ./src/js/entryFormater.js
+class EntryFormater {
+    /**
+     * split by |
+     * @param {value to format} value 
+     */
+    static splitByLine(value) {
+        return (value || '').trim().split('|').filter(val => val)
+    }
+}
 // CONCATENATED MODULE: ./src/js/panel.js
+
 
 
 
@@ -2072,6 +2094,13 @@ function appendRecord(type, record) {
 
                 let recordTypeEl = getParentUntilRecordEntry(ev.target)
                 if (recordTypeEl) {
+                    const target = ev.target,
+                        field = ev.target.getAttribute('entry_field'),
+                        // rawValue = 
+                        fieldFormatFunc = ev.target.getAttribute('entry_format')
+
+                    // finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc] :
+
                     let recordType = recordTypeEl.getAttribute('record_type'),
                         id = recordTypeEl.id
 
