@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <script src="./panel.js"></script>
     <link rel="stylesheet" href="./panel.css" />
+    <link rel="stylesheet" href="./theme.css" />
 </head>
 
-<body>
+<body class="bootstrap-frm">
     <textarea name="targetSelector" id="targetSelector" rows="5"></textarea>
     <br>
-    <button id="btnMarkTarget">MARK</button>
-    <button id="btnStart">START</button>
-    <button id="btnStop" disabled>STOP</button>
-    <button id="btnSave" disabled>SAVE</button>
+    <button class='btn btn-primary' id="btnMarkTarget">MARK</button>
+    <button class='btn btn-primary' id="btnStart">START</button>
+    <button class='btn btn-primary' id="btnStop" disabled>STOP</button>
+    <button class='btn btn-primary' id="btnSave" disabled>SAVE</button>
     <ul id="logs"></ul>
     <ul id="errors"></ul>
     <ul id="records"></ul>
