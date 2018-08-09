@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const getTargetSelectors = () => {
         const targetSelectorValue = (targetSelector.value || '').trim()
-        return targetSelectorValue.split('\n').map(val => val.trim())
+        return targetSelectorValue.split('\n').map(val => val.trim()).filter(val => val)
     }
 
     btnMarkTarget.addEventListener('click', ev => {

@@ -128,6 +128,7 @@ let lastScrollDate = null,
     lastResizeDate = null
 
 const COMMON_THRESHOLD = 500
+const buttonTip = `title='0：左键；1：右键；2：滚轮键'`
 
 const ACTION_TYPES = new enum_default.a({
     NETWORK: {
@@ -614,9 +615,9 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                         </div>
                         <div class='item'>
-                        <div class='title'>BUTTON：</div>
+                        <div class='title' ${buttonTip}>BUTTON：</div>
                         <div class='value'>
-                            <textarea entry_field='button'>${record.button}</textarea>
+                            <textarea ${buttonTip} entry_field='button'>${record.button}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -673,9 +674,9 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                         </div>
                         <div class='item'>
-                        <div class='title'>BUTTON：</div>
+                        <div class='title' ${buttonTip}>BUTTON：</div>
                         <div class='value'>
-                        <textarea entry_field='button'>${record.button}</textarea>
+                        <textarea entry_field='button' ${buttonTip}>${record.button}</textarea>
                         </div>
                         </div>
                     </div>`
