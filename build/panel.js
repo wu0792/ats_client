@@ -163,7 +163,7 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>BODY：</div>
                         <div class='value'>
-                            <textarea>${record.body}</textarea>
+                            <textarea entry_field='body'>${record.body}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -229,16 +229,10 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                     </div>`
-        },
-        onDetailChanged: (id, ev) => {
-            return {
-                id,
-                target: ev.target.value.split('|')
-            }
         },
         wrapMessage: (msg) => {
             const { type, target } = msg
@@ -339,17 +333,6 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        onDetailChanged: (id, ev) => {
-            const target = ev.target,
-                field = target.getAttribute('entry_field'),
-                value = target.value.trim(),
-                finalValue = ''
-
-            return {
-                id,
-                [target]: ev.target.value.split('|')
-            }
-        },
         wrapMessage: (msg) => {
             const { target, value } = msg
             return { target, value }
@@ -401,7 +384,7 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -452,7 +435,7 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -503,13 +486,13 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
                         <div class='title'>CODE：</div>
                         <div class='value'>
-                            <textarea>${record.code}</textarea>
+                            <textarea entry_field='code'>${record.code}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -565,7 +548,7 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
@@ -627,13 +610,13 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
                         <div class='title'>BUTTON：</div>
                         <div class='value'>
-                            <textarea>${record.button}</textarea>
+                            <textarea entry_field='button'>${record.button}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -686,13 +669,13 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                         <div class='item'>
                         <div class='title'>BUTTON：</div>
                         <div class='value'>
-                        <textarea>${record.button}</textarea>
+                        <textarea entry_field='button'>${record.button}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -744,7 +727,7 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>TARGET：</div>
                         <div class='value'>
-                            <textarea>${record.target.join('|')}</textarea>
+                            <textarea entry_field='target' entry_format='splitByLine'>${record.target.join('|')}</textarea>
                         </div>
                         </div>
                     </div>`
@@ -795,11 +778,17 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='value'>[scroll]屏幕滚动</div>
                         </div>
                         <div class='item'>
-                        <div class='title'>(X, Y)：</div>
+                        <div class='title'>X：</div>
                         <div class='value'>
-                            <textarea>(${record.x},${record.y})</textarea>
+                            <textarea entry_field='x'>${record.x}</textarea>
                         </div>
                         </div>
+                        <div class='item'>
+                        <div class='title'>Y：</div>
+                        <div class='value'>
+                            <textarea entry_field='y'>${record.y}</textarea>
+                        </div>
+                        </div>                        
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -847,11 +836,17 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='value'>[resize]屏幕尺寸改变</div>
                         </div>
                         <div class='item'>
-                        <div class='title'>SIZE：</div>
+                        <div class='title'>WIDTH：</div>
                         <div class='value'>
-                            <textarea>(${record.width}, ${record.height})</textarea>
+                            <textarea entry_field='width'>${record.width}</textarea>
                         </div>
                         </div>
+                        <div class='item'>
+                        <div class='title'>HEIGHT：</div>
+                        <div class='value'>
+                            <textarea entry_field='height'>${record.height}</textarea>
+                        </div>
+                        </div>                        
                     </div>`
         },
         listen: (theDocument, ports) => {
@@ -2096,23 +2091,12 @@ function appendRecord(type, record) {
                 if (recordTypeEl) {
                     const target = ev.target,
                         field = ev.target.getAttribute('entry_field'),
-                        // rawValue = 
-                        fieldFormatFunc = ev.target.getAttribute('entry_format')
-
-                    // finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc] :
-
-                    let recordType = recordTypeEl.getAttribute('record_type'),
+                        rawValue = target.value.trim(),
+                        fieldFormatFunc = ev.target.getAttribute('entry_format'),
+                        finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc](rawValue) : rawValue,
                         id = recordTypeEl.id
 
-                    let recordTypeEnum = consts["a" /* ACTION_TYPES */].get(recordType),
-                        onDetailChanged = recordTypeEnum.value.onDetailChanged
-
-                    if (onDetailChanged) {
-                        let toRecordChangeEntry = onDetailChanged(id, ev)
-                        if (toRecordChangeEntry && toRecordChangeEntry.id) {
-                            changedMap[toRecordChangeEntry.id] = toRecordChangeEntry
-                        }
-                    }
+                    changedMap[id] = Object.assign({}, changedMap[id], { id, [field]: finalValue })
                 } else {
                     console.warn('not fuound parent element has record_type attribute.')
                 }

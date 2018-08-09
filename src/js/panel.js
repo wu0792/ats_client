@@ -78,23 +78,12 @@ function appendRecord(type, record) {
                 if (recordTypeEl) {
                     const target = ev.target,
                         field = ev.target.getAttribute('entry_field'),
-                        // rawValue = 
-                        fieldFormatFunc = ev.target.getAttribute('entry_format')
-
-                    // finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc] :
-
-                    let recordType = recordTypeEl.getAttribute('record_type'),
+                        rawValue = target.value.trim(),
+                        fieldFormatFunc = ev.target.getAttribute('entry_format'),
+                        finalValue = fieldFormatFunc ? EntryFormater[fieldFormatFunc](rawValue) : rawValue,
                         id = recordTypeEl.id
 
-                    let recordTypeEnum = CONSTS.ACTION_TYPES.get(recordType),
-                        onDetailChanged = recordTypeEnum.value.onDetailChanged
-
-                    if (onDetailChanged) {
-                        let toRecordChangeEntry = onDetailChanged(id, ev)
-                        if (toRecordChangeEntry && toRecordChangeEntry.id) {
-                            changedMap[toRecordChangeEntry.id] = toRecordChangeEntry
-                        }
-                    }
+                    changedMap[id] = Object.assign({}, changedMap[id], { id, [field]: finalValue })
                 } else {
                     console.warn('not fuound parent element has record_type attribute.')
                 }
