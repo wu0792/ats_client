@@ -69,11 +69,11 @@ li {
 }
 
 #records .summary li[id]:hover {
-    background-color: wheat;
+    background-color: #b1dcff;
 }
 
 #records .expand {
-    background-color: #f2f2f2;
+    background-color: #f1f7fe;
     border-bottom: solid 1px #b0e0e6;
     border-top: solid 1px #b0e0e6;
 }

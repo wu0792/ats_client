@@ -47,6 +47,10 @@ function appendRecord(type, record) {
     recordEntry.setAttribute('id', id)
     let recordSummary = createEntryEl(id + '', 'li', `${getCheckboxHtml()}${getNowString()}${type.value.renderSummary(record)}`)
     recordEntry.appendChild(recordSummary)
+    let checkbox = recordSummary.querySelector('input[type="checkbox"]')
+    if (checkbox) {
+        checkbox.addEventListener('click', ev => ev.stopPropagation())
+    }
 
     recordSummary.addEventListener('click', function (ev) {
         if (isRuning) {
