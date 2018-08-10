@@ -108,12 +108,17 @@ const isElementVisible = (elem) => {
         }
     }
 }
+// CONCATENATED MODULE: ./src/js/isElChildOf.js
+const isElChildOf = (el, parentEl) => {
+    return el === parentEl || (el.parentElement && isElChildOf(el.parentElement, parentEl))
+}
 // CONCATENATED MODULE: ./src/js/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_INIT_CONTENT; });
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
+
 
 
 
@@ -239,7 +244,7 @@ const ACTION_TYPES = new enum_default.a({
             const { type, target } = msg
             return { type, target }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     let target = mutation.target
@@ -268,6 +273,22 @@ const ACTION_TYPES = new enum_default.a({
                     const isVisible = isElementVisible(target)
                     if (!isVisible) {
                         return
+                    }
+
+                    if (rootTargetSelectors && rootTargetSelectors.length) {
+                        let isInRootTargets = false
+
+                        rootTargetSelectors.forEach(rootTargetSelector => {
+                            let rootTargets = Array.from(theDocument.querySelectorAll(rootTargetSelector))
+                            if (rootTargets.some(rootTarget => isElChildOf(target, rootTarget))) {
+                                isInRootTargets = true
+                                return false
+                            }
+                        })
+
+                        if (!isInRootTargets) {
+                            return
+                        }
                     }
 
                     const targetSelector = getSelector(target, theDocument)
@@ -338,7 +359,7 @@ const ACTION_TYPES = new enum_default.a({
             const { target, value } = msg
             return { target, value }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -390,7 +411,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -441,7 +462,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -498,7 +519,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -560,7 +581,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -622,7 +643,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 console.warn(ev)
@@ -681,7 +702,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 const targetSelector = getSelector(target, theDocument)
@@ -733,7 +754,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, clientX: x, clientY: y } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -792,7 +813,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
                     lastScrollDate = new Date()
@@ -850,7 +871,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastResizeDate === null || (new Date() - lastResizeDate) >= COMMON_THRESHOLD) {
                     lastResizeDate = new Date()
@@ -1961,7 +1982,7 @@ const getNowString = () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/js/consts.js + 1 modules
+// EXTERNAL MODULE: ./src/js/consts.js + 2 modules
 var consts = __webpack_require__(0);
 
 // CONCATENATED MODULE: ./src/js/saveFile.js
@@ -2021,6 +2042,7 @@ class EntryFormater {
 let isRuning = false,
     hasRegWatchNetwork = false,
     records = null,
+    targetSelectors = null,
     changedMap = {}
 
 let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] }),
@@ -2028,6 +2050,15 @@ let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNEC
     stopNetworkRequestFinishedListen = null
 
 const tabId = chrome.devtools.inspectedWindow.tabId
+
+function getTargetSelectors() {
+    if (targetSelectors) {
+        const targetSelectorValue = (targetSelectors.value || '').trim()
+        return targetSelectorValue.split('\n').map(val => val.trim()).filter(val => val)
+    } else {
+        return null
+    }
+}
 
 function createEntryEl(id, type, html, className) {
     let entry = document.createElement(type)
@@ -2118,7 +2149,7 @@ function doConnectToContent(url) {
         connectionToContent = chrome.tabs.connect(tabId, { name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
     }
 
-    connectionToContent.postMessage({ action: 'init', tabId, url })
+    connectionToContent.postMessage({ action: 'init', tabId, url, rootTargetSelectors: getTargetSelectors() })
     connectionToContent.onDisconnect.addListener(function () {
         connectionToContent = null
         doConnectToContent(url)
@@ -2134,24 +2165,19 @@ function doConnectToContent(url) {
 
 document.addEventListener('DOMContentLoaded', function () {
     records = document.getElementById('records')
+    targetSelectors = document.getElementById('targetSelectors')
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
         btnSave = document.getElementById('btnSave'),
-        btnMarkTarget = document.getElementById('btnMarkTarget'),
-        targetSelector = document.getElementById('targetSelector')
-
-    const getTargetSelectors = () => {
-        const targetSelectorValue = (targetSelector.value || '').trim()
-        return targetSelectorValue.split('\n').map(val => val.trim()).filter(val => val)
-    }
+        btnMarkTarget = document.getElementById('btnMarkTarget')
 
     btnMarkTarget.addEventListener('click', ev => {
         const targetSelectors = getTargetSelectors(),
-            markerClassName = '.__ats__target__'
+            markerClassName = '__ats__target__'
 
         chrome.tabs.executeScript(tabId, {
-            code: `Array.from(document.querySelectorAll('${markerClassName}')).forEach(el => el.remove())`
+            code: `Array.from(document.querySelectorAll('.${markerClassName}')).forEach(el => el.remove())`
         })
 
         targetSelectors.forEach(selector => {
@@ -2163,23 +2189,25 @@ document.addEventListener('DOMContentLoaded', function () {
             chrome.tabs.executeScript(tabId, {
                 code: `{
             let invalidSelectors = []
-            const theTarget = document.querySelector('${selector}')
+            const theTargetList = Array.from(document.querySelectorAll('${selector}'))
 
-            if (theTarget) {
-                const rect = theTarget.getBoundingClientRect()
-                let div = document.createElement('div')
-                div.style.position = 'absolute'
-                div.style.border = 'dashed 1px red'
-                div.style.top = rect.top + 'px'
-                div.style.left = rect.left + 'px'
-                div.style.width = rect.width + 'px'
-                div.style.height = rect.height + 'px'
-                div.style.opacity = '.3'
-                div.style.backgroundColor = 'wheat'
-                div.style.zIndex = '100000'
-                div.className = '${markerClassName}'
-
-                document.body.appendChild(div)
+            if (theTargetList.length) {
+                theTargetList.forEach(theTarget => {
+                    const rect = theTarget.getBoundingClientRect()
+                    let div = document.createElement('div')
+                    div.style.position = 'absolute'
+                    div.style.border = 'dashed 1px red'
+                    div.style.top = rect.top + 'px'
+                    div.style.left = rect.left + 'px'
+                    div.style.width = rect.width + 'px'
+                    div.style.height = rect.height + 'px'
+                    div.style.opacity = '.3'
+                    div.style.backgroundColor = 'wheat'
+                    div.style.zIndex = '100000'
+                    div.className = '${markerClassName}'
+    
+                    document.body.appendChild(div)
+                })
             } else {
                 invalidSelectors.push(selector)
             }

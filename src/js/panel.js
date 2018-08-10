@@ -7,6 +7,7 @@ import { EntryFormater } from './entryFormater';
 let isRuning = false,
     hasRegWatchNetwork = false,
     records = null,
+    targetSelectors = null,
     changedMap = {}
 
 let connectionToBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_INIT_PANEL }),
@@ -14,6 +15,15 @@ let connectionToBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_IN
     stopNetworkRequestFinishedListen = null
 
 const tabId = chrome.devtools.inspectedWindow.tabId
+
+function getTargetSelectors() {
+    if (targetSelectors) {
+        const targetSelectorValue = (targetSelectors.value || '').trim()
+        return targetSelectorValue.split('\n').map(val => val.trim()).filter(val => val)
+    } else {
+        return null
+    }
+}
 
 function createEntryEl(id, type, html, className) {
     let entry = document.createElement(type)
@@ -104,7 +114,7 @@ function doConnectToContent(url) {
         connectionToContent = chrome.tabs.connect(tabId, { name: CONSTS.CONNECT_ID_INIT_PANEL })
     }
 
-    connectionToContent.postMessage({ action: 'init', tabId, url })
+    connectionToContent.postMessage({ action: 'init', tabId, url, rootTargetSelectors: getTargetSelectors() })
     connectionToContent.onDisconnect.addListener(function () {
         connectionToContent = null
         doConnectToContent(url)
@@ -120,24 +130,19 @@ function doConnectToContent(url) {
 
 document.addEventListener('DOMContentLoaded', function () {
     records = document.getElementById('records')
+    targetSelectors = document.getElementById('targetSelectors')
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
         btnSave = document.getElementById('btnSave'),
-        btnMarkTarget = document.getElementById('btnMarkTarget'),
-        targetSelector = document.getElementById('targetSelector')
-
-    const getTargetSelectors = () => {
-        const targetSelectorValue = (targetSelector.value || '').trim()
-        return targetSelectorValue.split('\n').map(val => val.trim()).filter(val => val)
-    }
+        btnMarkTarget = document.getElementById('btnMarkTarget')
 
     btnMarkTarget.addEventListener('click', ev => {
         const targetSelectors = getTargetSelectors(),
-            markerClassName = '.__ats__target__'
+            markerClassName = '__ats__target__'
 
         chrome.tabs.executeScript(tabId, {
-            code: `Array.from(document.querySelectorAll('${markerClassName}')).forEach(el => el.remove())`
+            code: `Array.from(document.querySelectorAll('.${markerClassName}')).forEach(el => el.remove())`
         })
 
         targetSelectors.forEach(selector => {
@@ -149,23 +154,25 @@ document.addEventListener('DOMContentLoaded', function () {
             chrome.tabs.executeScript(tabId, {
                 code: `{
             let invalidSelectors = []
-            const theTarget = document.querySelector('${selector}')
+            const theTargetList = Array.from(document.querySelectorAll('${selector}'))
 
-            if (theTarget) {
-                const rect = theTarget.getBoundingClientRect()
-                let div = document.createElement('div')
-                div.style.position = 'absolute'
-                div.style.border = 'dashed 1px red'
-                div.style.top = rect.top + 'px'
-                div.style.left = rect.left + 'px'
-                div.style.width = rect.width + 'px'
-                div.style.height = rect.height + 'px'
-                div.style.opacity = '.3'
-                div.style.backgroundColor = 'wheat'
-                div.style.zIndex = '100000'
-                div.className = '${markerClassName}'
-
-                document.body.appendChild(div)
+            if (theTargetList.length) {
+                theTargetList.forEach(theTarget => {
+                    const rect = theTarget.getBoundingClientRect()
+                    let div = document.createElement('div')
+                    div.style.position = 'absolute'
+                    div.style.border = 'dashed 1px red'
+                    div.style.top = rect.top + 'px'
+                    div.style.left = rect.left + 'px'
+                    div.style.width = rect.width + 'px'
+                    div.style.height = rect.height + 'px'
+                    div.style.opacity = '.3'
+                    div.style.backgroundColor = 'wheat'
+                    div.style.zIndex = '100000'
+                    div.className = '${markerClassName}'
+    
+                    document.body.appendChild(div)
+                })
             } else {
                 invalidSelectors.push(selector)
             }

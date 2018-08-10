@@ -1,5 +1,6 @@
 import Enum from 'enum'
-import { isElementVisible } from './isElementVisible';
+import { isElementVisible } from './isElementVisible'
+import { isElChildOf } from './isElChildOf'
 
 const { getSelector } = require('./getSelector')
 
@@ -123,7 +124,7 @@ export const ACTION_TYPES = new Enum({
             const { type, target } = msg
             return { type, target }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     let target = mutation.target
@@ -152,6 +153,22 @@ export const ACTION_TYPES = new Enum({
                     const isVisible = isElementVisible(target)
                     if (!isVisible) {
                         return
+                    }
+
+                    if (rootTargetSelectors && rootTargetSelectors.length) {
+                        let isInRootTargets = false
+
+                        rootTargetSelectors.forEach(rootTargetSelector => {
+                            let rootTargets = Array.from(theDocument.querySelectorAll(rootTargetSelector))
+                            if (rootTargets.some(rootTarget => isElChildOf(target, rootTarget))) {
+                                isInRootTargets = true
+                                return false
+                            }
+                        })
+
+                        if (!isInRootTargets) {
+                            return
+                        }
                     }
 
                     const targetSelector = getSelector(target, theDocument)
@@ -222,7 +239,7 @@ export const ACTION_TYPES = new Enum({
             const { target, value } = msg
             return { target, value }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -274,7 +291,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -325,7 +342,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -382,7 +399,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -444,7 +461,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -506,7 +523,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 console.warn(ev)
@@ -565,7 +582,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 const targetSelector = getSelector(target, theDocument)
@@ -617,7 +634,7 @@ export const ACTION_TYPES = new Enum({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, clientX: x, clientY: y } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -676,7 +693,7 @@ export const ACTION_TYPES = new Enum({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
                     lastScrollDate = new Date()
@@ -734,7 +751,7 @@ export const ACTION_TYPES = new Enum({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastResizeDate === null || (new Date() - lastResizeDate) >= COMMON_THRESHOLD) {
                     lastResizeDate = new Date()

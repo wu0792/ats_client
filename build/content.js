@@ -108,12 +108,17 @@ const isElementVisible = (elem) => {
         }
     }
 }
+// CONCATENATED MODULE: ./src/js/isElChildOf.js
+const isElChildOf = (el, parentEl) => {
+    return el === parentEl || (el.parentElement && isElChildOf(el.parentElement, parentEl))
+}
 // CONCATENATED MODULE: ./src/js/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_INIT_CONTENT; });
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
+
 
 
 
@@ -239,7 +244,7 @@ const ACTION_TYPES = new enum_default.a({
             const { type, target } = msg
             return { type, target }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     let target = mutation.target
@@ -268,6 +273,22 @@ const ACTION_TYPES = new enum_default.a({
                     const isVisible = isElementVisible(target)
                     if (!isVisible) {
                         return
+                    }
+
+                    if (rootTargetSelectors && rootTargetSelectors.length) {
+                        let isInRootTargets = false
+
+                        rootTargetSelectors.forEach(rootTargetSelector => {
+                            let rootTargets = Array.from(theDocument.querySelectorAll(rootTargetSelector))
+                            if (rootTargets.some(rootTarget => isElChildOf(target, rootTarget))) {
+                                isInRootTargets = true
+                                return false
+                            }
+                        })
+
+                        if (!isInRootTargets) {
+                            return
+                        }
                     }
 
                     const targetSelector = getSelector(target, theDocument)
@@ -338,7 +359,7 @@ const ACTION_TYPES = new enum_default.a({
             const { target, value } = msg
             return { target, value }
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -390,7 +411,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -441,7 +462,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -498,7 +519,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -560,7 +581,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, code, repeat } = ev
                 if (repeat) {
@@ -622,7 +643,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 console.warn(ev)
@@ -681,7 +702,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
                 const targetSelector = getSelector(target, theDocument)
@@ -733,7 +754,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, clientX: x, clientY: y } = ev,
                     targetSelector = getSelector(target, theDocument)
@@ -792,7 +813,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastScrollDate === null || (new Date() - lastScrollDate) >= COMMON_THRESHOLD) {
                     lastScrollDate = new Date()
@@ -850,7 +871,7 @@ const ACTION_TYPES = new enum_default.a({
                         </div>                        
                     </div>`
         },
-        listen: (theDocument, ports) => {
+        listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 if (lastResizeDate === null || (new Date() - lastResizeDate) >= COMMON_THRESHOLD) {
                     lastResizeDate = new Date()
@@ -1943,7 +1964,7 @@ function guardReservedKeys(customName, key) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/js/consts.js + 1 modules
+// EXTERNAL MODULE: ./src/js/consts.js + 2 modules
 var consts = __webpack_require__(0);
 
 // CONCATENATED MODULE: ./src/js/userActivityListener.js
@@ -1953,10 +1974,10 @@ class UserActivityListener {
         this.userActivityEnums = userActivityEnums
     }
 
-    listen(theDocument) {
+    listen(theDocument, rootTargetSelectors) {
         let handlers = []
         this.userActivityEnums.forEach(userActivityEnum => {
-            handlers.push(userActivityEnum.value.listen(theDocument, this.ports))
+            handlers.push(userActivityEnum.value.listen(theDocument, this.ports, rootTargetSelectors))
         })
 
         return handlers
@@ -1980,12 +2001,12 @@ const connContentAndBackground = chrome.runtime.connect({ name: consts["b" /* CO
 let handlers = []
 
 //watch user input, hover
-function listen() {
+function listen(rootTargetSelectors) {
     userActivityListener = new UserActivityListener(
         [connContentAndBackground, connContentAndPanel],
         consts["a" /* ACTION_TYPES */].enums.filter(theEnum => !theEnum.value.skipListenInContent))
 
-    handlers = userActivityListener.listen(document)
+    handlers = userActivityListener.listen(document, rootTargetSelectors)
 }
 
 //watch user input, hover
@@ -1998,10 +2019,10 @@ chrome.runtime.onConnect.addListener(function (port) {
         case consts["c" /* CONNECT_ID_INIT_PANEL */]:
             connContentAndPanel = port
             port.onMessage.addListener(function (msg) {
-                const { action, tabId, url } = msg
+                const { action, tabId, url, rootTargetSelectors } = msg
                 if (action === 'init' && tabId && url) {
                     stopListen()
-                    listen()
+                    listen(rootTargetSelectors)
                 } else if (action === 'stop') {
                     stopListen()
                 }

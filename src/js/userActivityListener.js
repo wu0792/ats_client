@@ -4,10 +4,10 @@ export class UserActivityListener {
         this.userActivityEnums = userActivityEnums
     }
 
-    listen(theDocument) {
+    listen(theDocument, rootTargetSelectors) {
         let handlers = []
         this.userActivityEnums.forEach(userActivityEnum => {
-            handlers.push(userActivityEnum.value.listen(theDocument, this.ports))
+            handlers.push(userActivityEnum.value.listen(theDocument, this.ports, rootTargetSelectors))
         })
 
         return handlers
