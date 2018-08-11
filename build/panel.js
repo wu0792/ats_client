@@ -2176,7 +2176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btnSave = document.getElementById('btnSave'),
         btnMarkTarget = document.getElementById('btnMarkTarget')
 
-    btnMarkTarget.addEventListener('click', ev => {
+    targetSelectors.addEventListener('change', ev => {
         const targetSelectors = getTargetSelectors(),
             markerClassName = '__ats__target__'
 

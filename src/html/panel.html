@@ -8,12 +8,11 @@
 </head>
 
 <body class="bootstrap-frm">
-    <textarea name="targetSelectors" id="targetSelectors" rows="5"></textarea>
+    <textarea name="targetSelectors" id="targetSelectors" placeholder="targetSelectors: 需监听DOM变化的selector，可换行输入多个" rows="5"></textarea>
     <br>
-    <button class='btn btn-primary' id="btnMarkTarget">MARK</button>
-    <button class='btn btn-primary' id="btnStart">START</button>
-    <button class='btn btn-primary' id="btnStop" disabled>STOP</button>
-    <button class='btn btn-primary' id="btnSave" disabled>SAVE</button>
+    <button class='btn btn-primary' id="btnStart">开始录制</button>
+    <button class='btn btn-primary' id="btnStop" disabled>停止录制</button>
+    <button class='btn btn-primary' id="btnSave" disabled>保存</button>
     <ul id="logs"></ul>
     <ul id="errors"></ul>
     <ul id="records"></ul>
