@@ -2173,8 +2173,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const btnStart = document.getElementById('btnStart'),
         btnStop = document.getElementById('btnStop'),
-        btnSave = document.getElementById('btnSave'),
-        btnMarkTarget = document.getElementById('btnMarkTarget')
+        btnSave = document.getElementById('btnSave')
 
     targetSelectors.addEventListener('change', ev => {
         const targetSelectors = getTargetSelectors(),
@@ -2245,7 +2244,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 btnStart.disabled = true
                 btnStop.disabled = false
                 btnSave.disabled = true
-                btnMarkTarget.disabled = true
                 isRuning = true
 
                 watchNetwork()
@@ -2358,7 +2356,6 @@ document.addEventListener('DOMContentLoaded', function () {
         btnStart.disabled = false
         btnStop.disabled = true
         btnSave.disabled = false
-        btnMarkTarget.disabled = false
         isRuning = false
 
         records.className = 'stop'
