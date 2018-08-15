@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     targetSelectors = document.getElementById('targetSelectors')
 
     const btnStart = document.getElementById('btnStart'),
+        btnRecord = document.getElementById('btnRecord'),
         btnStop = document.getElementById('btnStop'),
         btnSave = document.getElementById('btnSave')
 
@@ -306,11 +307,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         isRuning = true
+        btnRecord.disabled = false
         records.className = 'recording'
         records.innerHTML = ''
         changedMap = {}
 
         connectionToBackground.postMessage({ action: 'init', tabId })
+    })
+
+    btnRecord.addEventListener('click', (ev) => {
+        if (!isRuning) {
+            return
+        }
+
+        btnRecord.disabled = true
+
+        connectionToContent.postMessage({ action: 'record' })
     })
 
     btnStop.addEventListener('click', (ev) => {
@@ -319,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         btnStart.disabled = false
+        btnRecord.disabled = false
         btnStop.disabled = true
         btnSave.disabled = false
         isRuning = false

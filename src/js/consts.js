@@ -15,9 +15,21 @@ let lastScrollDate = null,
 const COMMON_THRESHOLD = 500
 const buttonTip = `title='0：左键；1：右键；2：滚轮键'`
 
+/**
+ * at which phase should the action type be listen:
+ * INIT:  after we start the capture
+ * RECORD: after we start record, generally it's dom mutation
+ * NEVER: never be listened in content js
+ */
+export const LISTEN_IN_CONTENT_PHASE = {
+    INIT: 0,
+    RECORD: 1,
+    NEVER: 2
+}
+
 export const ACTION_TYPES = new Enum({
     NETWORK: {
-        skipListenInContent: true,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.NEVER,
         renderTitle: (record) => {
             return `network: ${JSON.stringify(record)}`
         },
@@ -60,7 +72,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     NAVIGATE: {
-        skipListenInContent: true,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.NEVER,
         renderTitle: (record) => {
             const { url } = record
 
@@ -91,7 +103,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MUTATION: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `dom: ${JSON.stringify(record)}`
         },
@@ -125,6 +137,19 @@ export const ACTION_TYPES = new Enum({
             return { type, target }
         },
         listen: (theDocument, ports, rootTargetSelectors) => {
+            const notifyPorts = (targetSelector, mutation) => {
+                const message = {
+                    action: ACTION_TYPES.MUTATION.key,
+                    type: mutation.type,
+                    target: targetSelector,
+                    added: mutation.addedNodes,
+                    attribute: mutation.attributeName,
+                    removed: mutation.removedNodes
+                }
+
+                ports.forEach(port => port.postMessage(message))
+            }
+
             const mutationObserver = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     let target = mutation.target
@@ -174,16 +199,7 @@ export const ACTION_TYPES = new Enum({
                     const targetSelector = getSelector(target, theDocument)
 
                     if (targetSelector) {
-                        const message = {
-                            action: ACTION_TYPES.MUTATION.key,
-                            type: mutation.type,
-                            target: targetSelector,
-                            added: mutation.addedNodes,
-                            attribute: mutation.attributeName,
-                            removed: mutation.removedNodes
-                        }
-
-                        ports.forEach(port => port.postMessage(message))
+                        notifyPorts(targetSelector, mutation)
                     }
                 })
             })
@@ -197,6 +213,13 @@ export const ACTION_TYPES = new Enum({
                 characterDataOldValue: true
             })
 
+            let toRecordTargetSelectors = rootTargetSelectors.length ? rootTargetSelectors : ['body']
+            toRecordTargetSelectors.forEach(selector => {
+                notifyPorts([selector], {
+                    type: 'init'
+                })
+            })
+
             return mutationObserver
         },
         stopListen: (_theDocument, mutationObserver) => {
@@ -204,7 +227,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     CHANGE: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `change: ${JSON.stringify(record)}`
         },
@@ -262,7 +285,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     FOCUS: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `focus: ${JSON.stringify(record)}`
         },
@@ -313,7 +336,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     BLUR: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `blur: ${JSON.stringify(record)}`
         },
@@ -364,7 +387,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYDOWN: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
@@ -426,7 +449,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYUP: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `keyup: ${JSON.stringify(record)}`
         },
@@ -488,7 +511,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEDOWN: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `mousedown: ${JSON.stringify(record)}`
         },
@@ -547,7 +570,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEUP: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `mouseup: ${JSON.stringify(record)}`
         },
@@ -605,7 +628,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEOVER: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `mouseover: ${JSON.stringify(record)}`
         },
@@ -658,7 +681,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     SCROLL: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -716,7 +739,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     RESIZE: {
-        skipListenInContent: false,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
