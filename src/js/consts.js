@@ -227,7 +227,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     CHANGE: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `change: ${JSON.stringify(record)}`
         },
@@ -285,7 +285,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     FOCUS: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `focus: ${JSON.stringify(record)}`
         },
@@ -336,7 +336,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     BLUR: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `blur: ${JSON.stringify(record)}`
         },
@@ -387,7 +387,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYDOWN: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `keydown: ${JSON.stringify(record)}`
         },
@@ -449,7 +449,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     KEYUP: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `keyup: ${JSON.stringify(record)}`
         },
@@ -511,7 +511,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEDOWN: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `mousedown: ${JSON.stringify(record)}`
         },
@@ -570,7 +570,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEUP: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `mouseup: ${JSON.stringify(record)}`
         },
@@ -628,7 +628,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     MOUSEOVER: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `mouseover: ${JSON.stringify(record)}`
         },
@@ -681,7 +681,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     SCROLL: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -739,7 +739,7 @@ export const ACTION_TYPES = new Enum({
         }
     },
     RESIZE: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
