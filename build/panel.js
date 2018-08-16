@@ -802,7 +802,7 @@ const ACTION_TYPES = new enum_default.a({
         }
     },
     SCROLL: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `Scroll: ${JSON.stringify(record)}`
         },
@@ -860,7 +860,7 @@ const ACTION_TYPES = new enum_default.a({
         }
     },
     RESIZE: {
-        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.RECORD,
+        listenInContentPhase: LISTEN_IN_CONTENT_PHASE.INIT,
         renderTitle: (record) => {
             return `Resize: ${JSON.stringify(record)}`
         },
@@ -910,6 +910,8 @@ const ACTION_TYPES = new enum_default.a({
             }
 
             theDocument.defaultView.addEventListener('resize', handler)
+
+            theDocument.defaultView.dispatchEvent(new Event('resize'))
 
             return handler
         },
