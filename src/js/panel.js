@@ -3,6 +3,7 @@ import { SaveFile } from './saveFile'
 import { system } from './system'
 import { getNowString } from '../common'
 import { EntryFormater } from './entryFormater';
+import { IsIncognitoMode } from './isIncognitoMode';
 
 let isRuning = false,
     hasRegWatchNetwork = false,
@@ -132,7 +133,18 @@ function doConnectToContent(url) {
     })
 }
 
+function checkIncognitoMode() {
+    IsIncognitoMode().then(incognitoMode => {
+        if (!incognitoMode) {
+            const tip = document.getElementById('tip')
+            tip.innerHTML = '建议您在隐身窗口模式使用该程序，打开隐身窗口快捷键： Ctrl + Shift + N <br/><b>注</b>：请先在配置页面 chrome://extensions 允许该扩展在隐身窗口启用'
+            tip.classList.remove('hide')
+        }
+    })
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    checkIncognitoMode()
     records = document.getElementById('records')
     targetSelectors = document.getElementById('targetSelectors')
 

@@ -2058,7 +2058,21 @@ class EntryFormater {
         return (value || '').trim().split('|').filter(val => val)
     }
 }
+// CONCATENATED MODULE: ./src/js/isIncognitoMode.js
+//detect whete the browser in incognito mode
+const IsIncognitoMode = () => new Promise(resolve => {
+    var fs = window.RequestFileSystem || window.webkitRequestFileSystem
+    if (!fs) {
+        //unknown
+        resolve(false)
+    } else {
+        fs(window.TEMPORARY, 100,
+            () => resolve(false),
+            () => resolve(true))
+    }
+})
 // CONCATENATED MODULE: ./src/js/panel.js
+
 
 
 
@@ -2193,7 +2207,18 @@ function doConnectToContent(url) {
     })
 }
 
+function checkIncognitoMode() {
+    IsIncognitoMode().then(incognitoMode => {
+        if (!incognitoMode) {
+            const tip = document.getElementById('tip')
+            tip.innerHTML = '建议您在隐身窗口模式使用该程序，打开隐身窗口快捷键： Ctrl + Shift + N <br/><b>注</b>：请先在配置页面 chrome://extensions 允许该扩展在隐身窗口启用'
+            tip.classList.remove('hide')
+        }
+    })
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    checkIncognitoMode()
     records = document.getElementById('records')
     targetSelectors = document.getElementById('targetSelectors')
 

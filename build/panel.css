@@ -7,6 +7,18 @@ li {
     list-style: none;
 }
 
+.hide{
+    display: none;
+}
+
+.warn{
+    background: rgb(156, 115, 72);
+    color: white;
+    padding: 5px;
+    line-height: 18px;
+    font-size: 12px;
+}
+
 #records .item::after {
     content: ".";
     display: block;
