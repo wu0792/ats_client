@@ -2080,7 +2080,8 @@ let isRuning = false,
     hasRegWatchNetwork = false,
     records = null,
     targetSelectors = null,
-    changedMap = {}
+    changedMap = {},
+    phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].NEVER
 
 let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] }),
     connectionToContent = null,
@@ -2191,6 +2192,8 @@ function doConnectToContent(url) {
     }
 
     connectionToContent.postMessage({ action: 'init', tabId, url, rootTargetSelectors: getTargetSelectors() })
+    phase === consts["d" /* LISTEN_IN_CONTENT_PHASE */].RECORD && connectionToContent.postMessage({ action: 'record' })
+
     connectionToContent.onDisconnect.addListener(function () {
         connectionToContent = null
         doConnectToContent(url)
@@ -2394,6 +2397,7 @@ document.addEventListener('DOMContentLoaded', function () {
         records.className = 'recording'
         records.innerHTML = ''
         changedMap = {}
+        phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].INIT
 
         connectionToBackground.postMessage({ action: 'init', tabId })
     })
@@ -2404,6 +2408,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         btnRecord.disabled = true
+        phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].RECORD
 
         connectionToContent.postMessage({ action: 'record' })
     })
@@ -2418,6 +2423,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btnStop.disabled = true
         btnSave.disabled = false
         isRuning = false
+        phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].NEVER
 
         records.className = 'stop'
 
