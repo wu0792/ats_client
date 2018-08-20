@@ -549,7 +549,6 @@ export const ACTION_TYPES = new Enum({
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
-                console.warn(ev)
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {

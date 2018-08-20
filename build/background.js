@@ -670,7 +670,6 @@ const ACTION_TYPES = new enum_default.a({
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
-                console.warn(ev)
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
@@ -1334,13 +1333,11 @@ const getSelector = (target, theDocument) => {
     }
 
     let searchTimes = 0
-    console.log(`getSelector`)
     let getValidSelector = (stepTarget, selectors) => {
         if (searchTimes >= 10) {
             return null
         }
 
-        console.log(`getValidSelector:${searchTimes++}`)
         const joinedSelector = selectors.join(' ')
 
         if (checkIfUniqe(joinedSelector)) {
@@ -2061,9 +2058,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                         existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                         tabs.set(activeTabId, existed)
-
-                        console.log(`receive ${theActionEnum.key}`)
-                        console.log(existed)
                     }
                 }
             })
@@ -2078,9 +2072,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                     existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                     tabs.set(activeTabId, existed)
-
-                    console.log(`receive ${theActionEnum.key}`)
-                    console.log(existed)
                 }
             })
             break

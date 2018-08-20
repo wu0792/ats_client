@@ -670,7 +670,6 @@ const ACTION_TYPES = new enum_default.a({
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
-                console.warn(ev)
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
@@ -1334,13 +1333,11 @@ const getSelector = (target, theDocument) => {
     }
 
     let searchTimes = 0
-    console.log(`getSelector`)
     let getValidSelector = (stepTarget, selectors) => {
         if (searchTimes >= 10) {
             return null
         }
 
-        console.log(`getValidSelector:${searchTimes++}`)
         const joinedSelector = selectors.join(' ')
 
         if (checkIfUniqe(joinedSelector)) {
@@ -2001,17 +1998,17 @@ class UserActivityListener {
     }
 
     listen(theDocument, rootTargetSelectors) {
-        let handlers = []
+        let handlers = {}
         this.userActivityEnums.forEach(userActivityEnum => {
-            handlers.push(userActivityEnum.value.listen(theDocument, this.ports, rootTargetSelectors))
+            handlers[userActivityEnum.key] = userActivityEnum.value.listen(theDocument, this.ports, rootTargetSelectors)
         })
 
         return handlers
     }
 
     stopListen(theDocument, handlers) {
-        this.userActivityEnums.forEach((userActivityEnum, index) => {
-            userActivityEnum.value.stopListen(theDocument, handlers[index])
+        this.userActivityEnums.forEach((userActivityEnum) => {
+            userActivityEnum.value.stopListen(theDocument, handlers[userActivityEnum.key])
         })
     }
 }
@@ -2025,7 +2022,7 @@ let connContentAndPanel = null,
 
 const connContentAndBackground = chrome.runtime.connect({ name: consts["b" /* CONNECT_ID_INIT_CONTENT */] })
 
-let handlers = []
+let handlers = {}
 
 //watch user input, hover
 function listen(phase) {
@@ -2034,17 +2031,13 @@ function listen(phase) {
         consts["a" /* ACTION_TYPES */].enums.filter(theEnum => theEnum.value.listenInContentPhase === phase))
 
     const newHandlers = userActivityListener.listen(document, rootTargetSelectors)
-    newHandlers.forEach(handler => {
-        if (handlers.indexOf(handler) < 0) {
-            handlers.push(handler)
-        }
-    })
+    Object.assign(handlers, newHandlers)
 }
 
 //watch user input, hover
 function stopListen() {
     userActivityListener && handlers.length && userActivityListener.stopListen(document, handlers)
-    handlers = []
+    handlers = {}
 }
 
 chrome.runtime.onConnect.addListener(function (port) {

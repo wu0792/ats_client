@@ -48,9 +48,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                         existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                         tabs.set(activeTabId, existed)
-
-                        console.log(`receive ${theActionEnum.key}`)
-                        console.log(existed)
                     }
                 }
             })
@@ -65,9 +62,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                     existed[theActionEnum.key.toLowerCase()].push(wrapMessageWithSeq(theActionEnum.value.wrapMessage(msg)))
                     tabs.set(activeTabId, existed)
-
-                    console.log(`receive ${theActionEnum.key}`)
-                    console.log(existed)
                 }
             })
             break

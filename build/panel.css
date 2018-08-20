@@ -7,12 +7,12 @@ li {
     list-style: none;
 }
 
-.hide{
+.hide {
     display: none;
 }
 
-.warn{
-    background: rgb(156, 115, 72);
+.warn {
+    background: #CC5353;
     color: white;
     padding: 5px;
     line-height: 18px;

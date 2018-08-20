@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         btnStart.disabled = false
-        btnRecord.disabled = false
+        btnRecord.disabled = true
         btnStop.disabled = true
         btnSave.disabled = false
         isRuning = false

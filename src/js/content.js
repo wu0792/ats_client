@@ -7,7 +7,7 @@ let connContentAndPanel = null,
 
 const connContentAndBackground = chrome.runtime.connect({ name: CONSTS.CONNECT_ID_INIT_CONTENT })
 
-let handlers = []
+let handlers = {}
 
 //watch user input, hover
 function listen(phase) {
@@ -16,17 +16,13 @@ function listen(phase) {
         CONSTS.ACTION_TYPES.enums.filter(theEnum => theEnum.value.listenInContentPhase === phase))
 
     const newHandlers = userActivityListener.listen(document, rootTargetSelectors)
-    newHandlers.forEach(handler => {
-        if (handlers.indexOf(handler) < 0) {
-            handlers.push(handler)
-        }
-    })
+    Object.assign(handlers, newHandlers)
 }
 
 //watch user input, hover
 function stopListen() {
     userActivityListener && handlers.length && userActivityListener.stopListen(document, handlers)
-    handlers = []
+    handlers = {}
 }
 
 chrome.runtime.onConnect.addListener(function (port) {

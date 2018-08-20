@@ -670,7 +670,6 @@ const ACTION_TYPES = new enum_default.a({
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
                 const { target, button } = ev
-                console.warn(ev)
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
@@ -1334,13 +1333,11 @@ const getSelector = (target, theDocument) => {
     }
 
     let searchTimes = 0
-    console.log(`getSelector`)
     let getValidSelector = (stepTarget, selectors) => {
         if (searchTimes >= 10) {
             return null
         }
 
-        console.log(`getValidSelector:${searchTimes++}`)
         const joinedSelector = selectors.join(' ')
 
         if (checkIfUniqe(joinedSelector)) {
@@ -2417,7 +2414,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         btnStart.disabled = false
-        btnRecord.disabled = false
+        btnRecord.disabled = true
         btnStop.disabled = true
         btnSave.disabled = false
         isRuning = false
