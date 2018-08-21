@@ -637,8 +637,8 @@ const ACTION_TYPES = new enum_default.a({
             return `mousedown: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { target, button } = msg
-            return { target, button }
+            const { target, button, x, y } = msg
+            return { target, button, x, y }
         },
         renderSummary: (record) => {
             return `<span class='icon mousedown' title='[mousedown]鼠标键按下'></span><div class='entry mousedown'>${record.target}</div>`
@@ -669,14 +669,16 @@ const ACTION_TYPES = new enum_default.a({
         },
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
-                const { target, button } = ev
+                const { target, button, pageX: x, pageY: y } = ev
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.MOUSEDOWN.key,
                         target: targetSelector,
-                        button
+                        button,
+                        x,
+                        y
                     }))
                 }
             }
@@ -695,8 +697,8 @@ const ACTION_TYPES = new enum_default.a({
             return `mouseup: ${JSON.stringify(record)}`
         },
         wrapMessage: (msg) => {
-            const { target, button } = msg
-            return { target, button }
+            const { target, button, x, y } = msg
+            return { target, button, x, y }
         },
         renderSummary: (record) => {
             return `<span class='icon mouseup' title='[mouseup]鼠标键弹起'></span><div class='entry mouseup'>${record.target}</div>`
@@ -727,14 +729,16 @@ const ACTION_TYPES = new enum_default.a({
         },
         listen: (theDocument, ports, rootTargetSelectors) => {
             const handler = (ev) => {
-                const { target, button } = ev
+                const { target, button, pageX: x, pageY: y } = ev
                 const targetSelector = getSelector(target, theDocument)
 
                 if (targetSelector) {
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.MOUSEUP.key,
                         target: targetSelector,
-                        button
+                        button,
+                        x,
+                        y
                     }))
                 }
             }
