@@ -255,13 +255,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                 })
 
-                SaveFile.saveJson({
-                    id: +now,
-                    version: system.version,
-                    rootTargets: getTargetSelectors(),
-                    createAt: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
-                    data
-                }, document, `ats_data.json`)
+                chrome.tabs.executeScript(tabId, {
+                    code: `({outerWidth,outerHeight,innerWidth,innerHeight})`
+                }, result => {
+                    const initSize = result[0]
+
+                    SaveFile.saveJson({
+                        id: +now,
+                        version: system.version,
+                        initSize,
+                        rootTargets: getTargetSelectors(),
+                        createAt: `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
+                        data
+                    }, document, `ats_data.json`)
+                })
                 break
             default:
                 break

@@ -213,13 +213,6 @@ export const ACTION_TYPES = new Enum({
                 characterDataOldValue: true
             })
 
-            let toRecordTargetSelectors = rootTargetSelectors.length ? rootTargetSelectors : ['body']
-            toRecordTargetSelectors.forEach(selector => {
-                notifyPorts([selector], {
-                    type: 'init'
-                })
-            })
-
             return mutationObserver
         },
         stopListen: (_theDocument, mutationObserver) => {
