@@ -2008,9 +2008,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const NETWORK_REDUNDANT = 'network_redundant'
+
 let tabs = new Map(),
     activeTabId = 0,
-    allActionKeys = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].enums.map(theEnum => theEnum.key.toLowerCase())
+    allActionKeys = [..._consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].enums.map(theEnum => theEnum.key.toLowerCase()), NETWORK_REDUNDANT]
 
 function ensureExist(tabId) {
     let existed = tabs.get(tabId)
@@ -2046,8 +2048,70 @@ chrome.runtime.onConnect.addListener(function (port) {
                     chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
                         port.postMessage({ action: 'start' })
                     })
+
+                    var version = "1.0";
+
+                    chrome.debugger.attach({ //debug at current tab
+                        tabId: tabId
+                    }, version, onAttach.bind(null, tabId))
+
+                    function onAttach(tabId) {
+                        chrome.debugger.sendCommand({ //first enable the Network
+                            tabId: tabId
+                        }, "Network.enable")
+
+                        chrome.debugger.onEvent.addListener(allEventHandler)
+                    }
+
+                    function allEventHandler(debuggeeId, message, params) {
+                        if (tabId !== debuggeeId.tabId) {
+                            return
+                        }
+
+                        if (message === "Network.responseReceived") { //response return 
+                            chrome.debugger.sendCommand({
+                                tabId: tabId
+                            }, "Network.getResponseBody", {
+                                    "requestId": params.requestId
+                                }, function (response) {
+                                    // chrome.debugger.detach(debuggeeId);
+                                    let url = params.response ? params.response.url : ''
+                                    if (url) {
+                                        if (params.response && params.response.headers && (params.response.headers["content-type"] || params.response.headers["Content-Type"] || '').toLowerCase().indexOf('image') >= 0) {
+                                            return
+                                        } else {
+                                            let existed = ensureExist(tabId)
+                                            existed[NETWORK_REDUNDANT].push({ url, body: response ? response.body : null })
+                                        }
+                                    }
+                                });
+                        }
+                    }
                 } else if (action === 'save') {
-                    port.postMessage({ action: 'dump', data: ensureExist(activeTabId) })
+                    let existed = ensureExist(activeTabId),
+                        networks = existed[_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK.key.toLowerCase()],
+                        networksRedundant = existed[NETWORK_REDUNDANT]
+
+                    networks.forEach(network => {
+                        let { id, url, body, status } = network
+                        if (body === null && Math.floor(status / 100) !== 3) {
+                            let networksOfSameUrl = networks.filter(item => item.url === url),
+                                sequence = networksOfSameUrl.findIndex(item => item.id === id)
+
+                            if (sequence >= 0) {
+                                let networksRedundantOfSameUrl = networksRedundant.filter(item => item.url === url),
+                                    matchedNetworksRedundant = networksRedundantOfSameUrl[sequence]
+
+                                if (matchedNetworksRedundant) {
+                                    network.body = matchedNetworksRedundant.body
+                                }
+                            }
+                        }
+                    })
+
+                    delete existed[NETWORK_REDUNDANT]
+
+                    port.postMessage({ action: 'dump', data: existed })
                 } else if (activeTabId) {
                     const theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(action)
                     if (theActionEnum) {

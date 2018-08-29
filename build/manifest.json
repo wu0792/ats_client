@@ -8,6 +8,7 @@
     "activeTab",
     "declarativeContent",
     "storage",
+    "debugger",
     "webNavigation",
     "http://*/*",
     "https://*/*"

@@ -2078,7 +2078,8 @@ let isRuning = false,
     records = null,
     targetSelectors = null,
     changedMap = {},
-    phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].NEVER
+    phase = consts["d" /* LISTEN_IN_CONTENT_PHASE */].NEVER,
+    currentUrl = ''
 
 let connectionToBackground = chrome.runtime.connect({ name: consts["c" /* CONNECT_ID_INIT_PANEL */] }),
     connectionToContent = null,
@@ -2183,25 +2184,31 @@ function appendRecord(type, record) {
     records && records.appendChild(recordEntry)
 }
 
-function doConnectToContent(url) {
+function connectionToContentOnDisconnect() {
+    connectionToContent = null
+    doConnectToContent()
+}
+
+function connectionToContentOnMessage(request) {
+    const theActionEnum = consts["a" /* ACTION_TYPES */].get(request.action)
+    if (theActionEnum) {
+        appendRecord(theActionEnum, request)
+    }
+}
+
+function doConnectToContent() {
     if (!connectionToContent) {
         connectionToContent = chrome.tabs.connect(tabId, { name: consts["c" /* CONNECT_ID_INIT_PANEL */] })
     }
 
-    connectionToContent.postMessage({ action: 'init', tabId, url, rootTargetSelectors: getTargetSelectors() })
+    connectionToContent.postMessage({ action: 'init', tabId, url: currentUrl, rootTargetSelectors: getTargetSelectors() })
     phase === consts["d" /* LISTEN_IN_CONTENT_PHASE */].RECORD && connectionToContent.postMessage({ action: 'record' })
 
-    connectionToContent.onDisconnect.addListener(function () {
-        connectionToContent = null
-        doConnectToContent(url)
-    })
+    connectionToContent.onDisconnect.removeListener(connectionToContentOnDisconnect)
+    connectionToContent.onDisconnect.addListener(connectionToContentOnDisconnect)
 
-    connectionToContent.onMessage.addListener(function (request) {
-        const theActionEnum = consts["a" /* ACTION_TYPES */].get(request.action)
-        if (theActionEnum) {
-            appendRecord(theActionEnum, request)
-        }
-    })
+    connectionToContent.onMessage.removeListener(connectionToContentOnMessage)
+    connectionToContent.onMessage.addListener(connectionToContentOnMessage)
 }
 
 function checkIncognitoMode() {
@@ -2276,11 +2283,12 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     chrome.webNavigation.onCommitted.addListener((ev) => {
-        const { tabId: currentTabId, url, frameId, timeStamp } = ev
+        const { tabId: currentTabId, url, frameId } = ev
 
         // frameId 表示当前page中frame的ID，0表示window.top对应frame，正数表示其余subFrame
         if (isRuning && currentTabId === tabId && frameId === 0) {
-            doConnectToContent(url)
+            currentUrl = url
+            doConnectToContent()
             connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NAVIGATE.key, url })
             appendRecord(consts["a" /* ACTION_TYPES */].NAVIGATE, { url })
         }
