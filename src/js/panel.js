@@ -221,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (isRuning && currentTabId === tabId && frameId === 0) {
             currentUrl = url
             doConnectToContent()
-            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NAVIGATE.key, url })
-            appendRecord(CONSTS.ACTION_TYPES.NAVIGATE, { url })
+            connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NAVIGATE.key, url, flag: '' })
+            appendRecord(CONSTS.ACTION_TYPES.NAVIGATE, { url, flag: '' })
 
             chrome.tabs.executeScript(tabId, {
                 code: `
