@@ -102,9 +102,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                         }
                     })
 
-                    delete existed[NETWORK_REDUNDANT]
-
-                    port.postMessage({ action: 'dump', data: existed })
+                    port.postMessage({ action: 'dump', data: Object.assign({}, existed, { [NETWORK_REDUNDANT]: undefined }) })
                 } else if (activeTabId) {
                     const theActionEnum = CONSTS.ACTION_TYPES.get(action)
                     if (theActionEnum) {
