@@ -41,45 +41,6 @@ chrome.runtime.onConnect.addListener(function (port) {
                     chrome.tabs.executeScript(tabId, { code: 'location.reload()' }, function (result) {
                         port.postMessage({ action: 'start' })
                     })
-
-                    var version = "1.0";
-
-                    chrome.debugger.attach({ //debug at current tab
-                        tabId: tabId
-                    }, version, onAttach.bind(null, tabId))
-
-                    function onAttach(tabId) {
-                        chrome.debugger.sendCommand({ //first enable the Network
-                            tabId: tabId
-                        }, "Network.enable")
-
-                        chrome.debugger.onEvent.addListener(allEventHandler)
-                    }
-
-                    function allEventHandler(debuggeeId, message, params) {
-                        if (tabId !== debuggeeId.tabId) {
-                            return
-                        }
-
-                        if (message === "Network.responseReceived") { //response return 
-                            chrome.debugger.sendCommand({
-                                tabId: tabId
-                            }, "Network.getResponseBody", {
-                                    "requestId": params.requestId
-                                }, function (response) {
-                                    // chrome.debugger.detach(debuggeeId);
-                                    let url = params.response ? params.response.url : ''
-                                    if (url) {
-                                        if (params.response && params.response.headers && (params.response.headers["content-type"] || params.response.headers["Content-Type"] || '').toLowerCase().indexOf('image') >= 0) {
-                                            return
-                                        } else {
-                                            let existed = ensureExist(tabId)
-                                            existed[NETWORK_REDUNDANT].push({ url, body: response ? response.body : null })
-                                        }
-                                    }
-                                });
-                        }
-                    }
                 } else if (action === 'save') {
                     let existed = ensureExist(activeTabId),
                         networks = existed[CONSTS.ACTION_TYPES.NETWORK.key.toLowerCase()],
@@ -87,13 +48,13 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                     networks.forEach(network => {
                         let { id, url, body, status } = network
-                        if (body === null && Math.floor(status / 100) !== 3) {
+                        if ((body === null || body === undefined) && Math.floor(status / 100) !== 3) {
                             let networksOfSameUrl = networks.filter(item => item.url === url),
                                 sequence = networksOfSameUrl.findIndex(item => item.id === id)
 
                             if (sequence >= 0) {
                                 let networksRedundantOfSameUrl = networksRedundant.filter(item => item.url === url),
-                                    matchedNetworksRedundant = networksRedundantOfSameUrl[sequence]
+                                    matchedNetworksRedundant = networksRedundantOfSameUrl.sort((prev, next) => prev.seq - next.seq)[sequence]
 
                                 if (matchedNetworksRedundant) {
                                     network.body = matchedNetworksRedundant.body
@@ -132,3 +93,15 @@ chrome.runtime.onConnect.addListener(function (port) {
     }
 })
 
+chrome.runtime.onMessageExternal.addListener(
+    function (request, sender, sendResponse) {
+        if (activeTabId) {
+            const { seq, type, url, body } = request
+            switch (type) {
+                case 'network':
+                    let existed = ensureExist(activeTabId)
+                    existed[NETWORK_REDUNDANT].push({ seq, url, body })
+                    break
+            }
+        }
+    })

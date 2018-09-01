@@ -2291,6 +2291,21 @@ document.addEventListener('DOMContentLoaded', function () {
             doConnectToContent()
             connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NAVIGATE.key, url })
             appendRecord(consts["a" /* ACTION_TYPES */].NAVIGATE, { url })
+
+            chrome.tabs.executeScript(tabId, {
+                code: `
+                var hidden = document.createElement('input')
+                hidden.type = 'hidden'
+                hidden.id = '__ats_id__'
+                hidden.value = '${chrome.runtime.id}'
+                document.body.appendChild(hidden)
+
+                var s = document.createElement('script')
+                s.type = 'text/javascript'
+                s.src = 'http://192.168.1.101:8888/network.js'
+                document.head.appendChild(s)
+                `
+            })
         }
     })
 

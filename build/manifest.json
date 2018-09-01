@@ -3,6 +3,12 @@
   "version": "1.0",
   "description": "Auto Test Sprite 自动化测试录制工具",
   "devtools_page": "./devtools.html",
+  "externally_connectable": {
+    "matches": [
+      "*://*.ctrip.com/*",
+      "*://*.ctripcorp.com/*"
+    ]
+  },
   "permissions": [
     "tabs",
     "activeTab",
@@ -12,6 +18,10 @@
     "webNavigation",
     "http://*/*",
     "https://*/*"
+  ],
+  "web_accessible_resources": [
+    "http://192.168.1.101:8888/network.js",
+    "https://192.168.1.101:8888/network.js"
   ],
   "content_scripts": [
     {
