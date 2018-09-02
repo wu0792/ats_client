@@ -199,12 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
                     document.body.appendChild(div)
                 })
-            } else {
-                invalidSelectors.push(selector)
-            }
-            
-            if(invalidSelectors.length){
-                alert('invalid selectors: ' + invalidSelectors.join(','))
             }
         }` })
         })
@@ -234,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 var s = document.createElement('script')
                 s.type = 'text/javascript'
-                s.src = 'http://192.168.1.101:8888/network.js'
+                s.src = '//localhost:8888/network.js'
                 document.head.appendChild(s)
                 `
             })
