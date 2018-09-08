@@ -1,6 +1,7 @@
 import Enum from 'enum'
 import { isElementVisible } from './isElementVisible'
 import { isElChildOf } from './isElChildOf'
+import { KeyCodeMapping } from './keyCodeMapping';
 
 const { getSelector } = require('./getSelector')
 
@@ -442,7 +443,7 @@ export const ACTION_TYPES = new Enum({
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.KEYDOWN.key,
                         target: targetSelector,
-                        code
+                        code: KeyCodeMapping[code] || code      //replace the numpad keycode with normal keycode
                     }))
                 }
             }

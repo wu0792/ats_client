@@ -1,9 +1,9 @@
-import * as CONSTS from './consts'
-import { SaveFile } from './saveFile'
-import { system } from './system'
-import { getNowString } from '../common'
-import { EntryFormater } from './entryFormater';
-import { IsIncognitoMode } from './isIncognitoMode';
+import * as CONSTS from './common/consts'
+import { SaveFile } from './common/saveFile'
+import { system } from './common/system'
+import { getNowString } from './common/getNow'
+import { EntryFormater } from './common/entryFormater';
+import { IsIncognitoMode } from './common/isIncognitoMode';
 
 let isRuning = false,
     hasRegWatchNetwork = false,

@@ -94,7 +94,7 @@
 var node_modules_enum = __webpack_require__(2);
 var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
 
-// CONCATENATED MODULE: ./src/js/isElementVisible.js
+// CONCATENATED MODULE: ./src/js/common/isElementVisible.js
 const isElementVisible = (elem) => {
     if (!elem || elem.offsetParent === null) {
         return false
@@ -108,17 +108,32 @@ const isElementVisible = (elem) => {
         }
     }
 }
-// CONCATENATED MODULE: ./src/js/isElChildOf.js
+// CONCATENATED MODULE: ./src/js/common/isElChildOf.js
 const isElChildOf = (el, parentEl) => {
     return el === parentEl || (el.parentElement && isElChildOf(el.parentElement, parentEl))
 }
-// CONCATENATED MODULE: ./src/js/consts.js
+// CONCATENATED MODULE: ./src/js/common/keyCodeMapping.js
+const KeyCodeMapping = {
+    Numpad0: "Digit0",
+    Numpad1: "Digit1",
+    Numpad2: "Digit2",
+    Numpad3: "Digit3",
+    Numpad4: "Digit4",
+    Numpad5: "Digit5",
+    Numpad6: "Digit6",
+    Numpad7: "Digit7",
+    Numpad8: "Digit8",
+    Numpad9: "Digit9",
+    NumpadDecimal: "Period"
+}
+// CONCATENATED MODULE: ./src/js/common/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_INIT_CONTENT; });
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return LISTEN_IN_CONTENT_PHASE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
+
 
 
 
@@ -563,7 +578,7 @@ const ACTION_TYPES = new enum_default.a({
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.KEYDOWN.key,
                         target: targetSelector,
-                        code
+                        code: KeyCodeMapping[code] || code      //replace the numpad keycode with normal keycode
                     }))
                 }
             }
@@ -2017,8 +2032,8 @@ const getNowString = () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _common_consts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+/* harmony import */ var _common_getNow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
 
 
 
@@ -2026,7 +2041,7 @@ const NETWORK_REDUNDANT = 'network_redundant'
 
 let tabs = new Map(),
     activeTabId = 0,
-    allActionKeys = [..._consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].enums.map(theEnum => theEnum.key.toLowerCase()), NETWORK_REDUNDANT]
+    allActionKeys = [..._common_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].enums.map(theEnum => theEnum.key.toLowerCase()), NETWORK_REDUNDANT]
 
 function ensureExist(tabId) {
     let existed = tabs.get(tabId)
@@ -2046,12 +2061,12 @@ function ensureExist(tabId) {
 let seq = 0
 
 const wrapMessageWithSeq = (message) => {
-    return Object.assign(message, { id: seq++, time: Object(_common__WEBPACK_IMPORTED_MODULE_1__[/* getNow */ "a"])() })
+    return Object.assign(message, { id: seq++, time: Object(_common_getNow__WEBPACK_IMPORTED_MODULE_1__[/* getNow */ "a"])() })
 }
 
 chrome.runtime.onConnect.addListener(function (port) {
     switch (port.name) {
-        case _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"]:
+        case _common_consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_PANEL */ "c"]:
             port.onMessage.addListener(function (msg) {
                 const { action, tabId } = msg
 
@@ -2064,7 +2079,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                     })
                 } else if (action === 'save') {
                     let existed = ensureExist(activeTabId),
-                        networks = existed[_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK.key.toLowerCase()],
+                        networks = existed[_common_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].NETWORK.key.toLowerCase()],
                         networksRedundant = existed[NETWORK_REDUNDANT]
 
                     networks.forEach(network => {
@@ -2086,7 +2101,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                     port.postMessage({ action: 'dump', data: Object.assign({}, existed, { [NETWORK_REDUNDANT]: undefined }) })
                 } else if (activeTabId) {
-                    const theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(action)
+                    const theActionEnum = _common_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(action)
                     if (theActionEnum) {
                         let existed = ensureExist(activeTabId)
 
@@ -2097,10 +2112,10 @@ chrome.runtime.onConnect.addListener(function (port) {
             })
             break
         // track network
-        case _consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_CONTENT */ "b"]:
+        case _common_consts__WEBPACK_IMPORTED_MODULE_0__[/* CONNECT_ID_INIT_CONTENT */ "b"]:
             port.onMessage.addListener(function (msg) {
                 let action = msg.action
-                const theActionEnum = _consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(action)
+                const theActionEnum = _common_consts__WEBPACK_IMPORTED_MODULE_0__[/* ACTION_TYPES */ "a"].get(action)
                 if (theActionEnum) {
                     let existed = ensureExist(activeTabId)
 

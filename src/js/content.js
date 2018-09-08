@@ -1,5 +1,5 @@
-import * as CONSTS from './consts'
-import { UserActivityListener } from './userActivityListener';
+import * as CONSTS from './common/consts'
+import { UserActivityListener } from './common/userActivityListener';
 
 let connContentAndPanel = null,
     userActivityListener = null,

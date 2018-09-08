@@ -94,7 +94,7 @@
 var node_modules_enum = __webpack_require__(2);
 var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
 
-// CONCATENATED MODULE: ./src/js/isElementVisible.js
+// CONCATENATED MODULE: ./src/js/common/isElementVisible.js
 const isElementVisible = (elem) => {
     if (!elem || elem.offsetParent === null) {
         return false
@@ -108,17 +108,32 @@ const isElementVisible = (elem) => {
         }
     }
 }
-// CONCATENATED MODULE: ./src/js/isElChildOf.js
+// CONCATENATED MODULE: ./src/js/common/isElChildOf.js
 const isElChildOf = (el, parentEl) => {
     return el === parentEl || (el.parentElement && isElChildOf(el.parentElement, parentEl))
 }
-// CONCATENATED MODULE: ./src/js/consts.js
+// CONCATENATED MODULE: ./src/js/common/keyCodeMapping.js
+const KeyCodeMapping = {
+    Numpad0: "Digit0",
+    Numpad1: "Digit1",
+    Numpad2: "Digit2",
+    Numpad3: "Digit3",
+    Numpad4: "Digit4",
+    Numpad5: "Digit5",
+    Numpad6: "Digit6",
+    Numpad7: "Digit7",
+    Numpad8: "Digit8",
+    Numpad9: "Digit9",
+    NumpadDecimal: "Period"
+}
+// CONCATENATED MODULE: ./src/js/common/consts.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CONNECT_ID_INIT_PANEL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CONNECT_ID_INIT_CONTENT; });
 /* unused harmony export CONNECT_ID_WATCH_DOM_MUTATION */
 /* unused harmony export CONNECT_ID_WATCH_USER_ACTIVITY */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return LISTEN_IN_CONTENT_PHASE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ACTION_TYPES; });
+
 
 
 
@@ -563,7 +578,7 @@ const ACTION_TYPES = new enum_default.a({
                     ports.forEach(port => port.postMessage({
                         action: ACTION_TYPES.KEYDOWN.key,
                         target: targetSelector,
-                        code
+                        code: KeyCodeMapping[code] || code      //replace the numpad keycode with normal keycode
                     }))
                 }
             }
@@ -1998,10 +2013,10 @@ function guardReservedKeys(customName, key) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./src/js/consts.js + 2 modules
+// EXTERNAL MODULE: ./src/js/common/consts.js + 3 modules
 var consts = __webpack_require__(0);
 
-// CONCATENATED MODULE: ./src/js/userActivityListener.js
+// CONCATENATED MODULE: ./src/js/common/userActivityListener.js
 class UserActivityListener {
     constructor(ports, userActivityEnums) {
         this.ports = ports

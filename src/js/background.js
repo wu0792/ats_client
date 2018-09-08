@@ -1,5 +1,5 @@
-import * as CONSTS from './consts'
-import { getNow } from '../common';
+import * as CONSTS from './common/consts'
+import { getNow } from './common/getNow'
 
 const NETWORK_REDUNDANT = 'network_redundant'
 
