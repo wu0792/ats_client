@@ -185,11 +185,19 @@ const ACTION_TYPES = new enum_default.a({
                             <textarea entry_field='body'>${record.body}</textarea>
                         </div>
                         </div>
+                        ${record.redirectUrl ? '' +
+                    "<div class='item'>" +
+                    "   <div class='title'>REDIRECT URL：</div>" +
+                    "   <div class='value'>" +
+                    "       <textarea entry_field='body'>" + record.redirectUrl + "</textarea>" +
+                    "   </div>" +
+                    "</div>"
+                    : ''}
                     </div>`
         },
         wrapMessage: (msg) => {
-            const { url, method, body, form, status, header } = msg
-            return { url, method, body, form, status, header }
+            const { url, method, body, form, status, header, redirectUrl } = msg
+            return { url, method, body, form, status, header, redirectUrl }
         }
     },
     NAVIGATE: {
@@ -2385,6 +2393,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     headers = response.headers || [],
                                     body = content
 
+                                const isRedirect = Math.floor(request.response.status / 100) === 3,
+                                    redirectUrl = isRedirect ? request.response.redirectURL : undefined
+
                                 let finalHeadersIsValid = false,
                                     finalHeaders = {}
 
@@ -2397,8 +2408,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     }
                                 })
 
-                                connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
-                                appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, method, body, form, status })
+                                connectionToBackground.postMessage({ action: consts["a" /* ACTION_TYPES */].NETWORK.key, url, redirectUrl, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
+                                appendRecord(consts["a" /* ACTION_TYPES */].NETWORK, { url, redirectUrl, method, body, form, status })
                             })
                         }
                     }

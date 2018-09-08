@@ -311,6 +311,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     headers = response.headers || [],
                                     body = content
 
+                                const isRedirect = Math.floor(request.response.status / 100) === 3,
+                                    redirectUrl = isRedirect ? request.response.redirectURL : undefined
+
                                 let finalHeadersIsValid = false,
                                     finalHeaders = {}
 
@@ -323,8 +326,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     }
                                 })
 
-                                connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
-                                appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, method, body, form, status })
+                                connectionToBackground.postMessage({ action: CONSTS.ACTION_TYPES.NETWORK.key, url, redirectUrl, status, method, body, form, header: (finalHeadersIsValid ? finalHeaders : null) })
+                                appendRecord(CONSTS.ACTION_TYPES.NETWORK, { url, redirectUrl, method, body, form, status })
                             })
                         }
                     }

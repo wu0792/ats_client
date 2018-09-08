@@ -64,11 +64,19 @@ export const ACTION_TYPES = new Enum({
                             <textarea entry_field='body'>${record.body}</textarea>
                         </div>
                         </div>
+                        ${record.redirectUrl ? '' +
+                    "<div class='item'>" +
+                    "   <div class='title'>REDIRECT URL：</div>" +
+                    "   <div class='value'>" +
+                    "       <textarea entry_field='body'>" + record.redirectUrl + "</textarea>" +
+                    "   </div>" +
+                    "</div>"
+                    : ''}
                     </div>`
         },
         wrapMessage: (msg) => {
-            const { url, method, body, form, status, header } = msg
-            return { url, method, body, form, status, header }
+            const { url, method, body, form, status, header, redirectUrl } = msg
+            return { url, method, body, form, status, header, redirectUrl }
         }
     },
     NAVIGATE: {
