@@ -20,7 +20,7 @@
     "https://*/*"
   ],
   "web_accessible_resources": [
-    "*://localhost:8888/network.js"
+    "*://cdn.rawgit.com/wu0792/ats_client/b690236e/ext/network.js"
   ],
   "content_scripts": [
     {

@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 var s = document.createElement('script')
                 s.type = 'text/javascript'
-                s.src = '//localhost:8888/network.js'
+                s.src = '//cdn.rawgit.com/wu0792/ats_client/b690236e/ext/network.js'
                 document.head.appendChild(s)
                 `
             })
