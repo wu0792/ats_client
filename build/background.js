@@ -238,18 +238,12 @@ const ACTION_TYPES = new enum_default.a({
                         <div class='item'>
                         <div class='title'>URL：</div>
                         <div class='value'>${record.url}</div>
-                        </div>
-                        <div class='item'>
-                        <div class='title'>FLAG：</div>
-                        <div class='value'>
-                            <textarea entry_field='flag' placeholder='用来判断是否完成页面加载的选择器，分两类：\n1）加载完成即隐藏某元素，比如加载过程一直有.loading元素，加载完成即消失，可录入 !.loading \n2）加载完成即显示某元素，比如加载完成即显示 .main 元素，可录入 .main'>${record.flag}</textarea>
-                        </div>
-                        </div>                        
+                        </div>                     
                     </div>`
         },
         wrapMessage: (msg) => {
-            const { url, flag } = msg
-            return { url, flag }
+            const { url } = msg
+            return { url }
         }
     },
     MUTATION: {
