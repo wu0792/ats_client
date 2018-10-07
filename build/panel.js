@@ -2060,7 +2060,7 @@ class SaveFile {
 }
 // CONCATENATED MODULE: ./src/js/common/system.js
 const system = {
-    version: '1.0'
+    version: '1.0.1'
 }
 // EXTERNAL MODULE: ./src/js/common/getNow.js
 var getNow = __webpack_require__(13);
