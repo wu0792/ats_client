@@ -25,11 +25,10 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             { from: './src/manifest.json', to: './', force: true },
-            { from: './src/html/devtools.html', to: './', force: true },
-            { from: './src/html/panel.html', to: './', force: true },
+            { from: './src/html/*', to: './', force: true, flatten: true },
             { from: './src/styles/panel.css', to: './', force: true },
             { from: './src/styles/theme.css', to: './', force: true },
-            { from: './src/images/icons.png', to: './', force: true },
+            { from: './src/images/*', to: './', force: true, flatten: true }
         ], {})
     ],
     watch: true
